@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Dune.Admin.Client/Dune.Admin.Client.csproj" />
+  <Project Path="Dune.Domain/Dune.Domain.csproj" />
+  <Project Path="Dune.Persistence.Service/Dune.Persistence.Service.csproj" />
+  <Project Path="Dune.Simulation.Service/Dune.Simulation.Service.csproj" />
+</Solution>

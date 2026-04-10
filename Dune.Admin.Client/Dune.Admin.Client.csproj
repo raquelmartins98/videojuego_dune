@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dune.Domain\Dune.Domain.csproj" />
+    <ProjectReference Include="..\Dune.Simulation.Service\Dune.Simulation.Service.csproj" />
+    <ProjectReference Include="..\Dune.Persistence.Service\Dune.Persistence.Service.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+</Project>

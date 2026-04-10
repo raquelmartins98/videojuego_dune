@@ -1,0 +1,11 @@
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\bin\Debug\net10.0\Dune.Domain.deps.json
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\bin\Debug\net10.0\Dune.Domain.dll
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\bin\Debug\net10.0\Dune.Domain.pdb
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\Dune.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\Dune.Domain.AssemblyInfoInputs.cache
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\Dune.Domain.AssemblyInfo.cs
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\Dune.Domain.csproj.CoreCompileInputs.cache
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\Dune.Domain.dll
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\refint\Dune.Domain.dll
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\Dune.Domain.pdb
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Domain\obj\Debug\net10.0\ref\Dune.Domain.dll
