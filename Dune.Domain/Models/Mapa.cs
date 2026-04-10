@@ -12,5 +12,7 @@ public enum TipoTerreno
     Desierto,
     Roca,
     ArenaMovida,
-    Especia
+    Melange,
+    EspeciaRosa,
+    EspeciaNegra
 }

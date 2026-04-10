@@ -10,6 +10,15 @@ using Dune.Simulation.Service;
 
 namespace Dune.Admin.Client.ViewModels;
 
+public class RecursoAgrupado
+{
+    public TipoRecurso Tipo { get; set; }
+    public int CantidadTotal { get; set; }
+    public int CantidadYacimientos { get; set; }
+    public int Regeneracion { get; set; }
+    public string Rareza { get; set; } = "";
+}
+
 public class MainViewModel : ViewModelBase
 {
     private readonly ISimulationService _simulationService;
@@ -17,24 +26,68 @@ public class MainViewModel : ViewModelBase
     private Partida? _partidaActual;
     private string _mensajeEstado = "Sin partida cargada";
     private readonly string _directorioGuardado;
-
+    private readonly string _archivoAutoGuardado;
+    
+    private readonly List<EventoSimulacion> _todosLosEventos = new();
+    private TipoEvento? _filtroActual;
+    private int _paginaActual = 1;
+    private const int EventosPorPagina = 8;
+    
     public MainViewModel()
     {
         _simulationService = new SimulationService();
         _persistenceService = new PersistenceService();
         _directorioGuardado = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Partidas");
+        _archivoAutoGuardado = Path.Combine(_directorioGuardado, "ultima_partida.json");
 
         Criaturas = new ObservableCollection<Criatura>();
         Enclaves = new ObservableCollection<Enclave>();
         Recursos = new ObservableCollection<Recurso>();
+        RecursosAgrupados = new ObservableCollection<RecursoAgrupado>();
+        RecursosPaginados = new ObservableCollection<RecursoAgrupado>();
         Instalaciones = new ObservableCollection<Instalacion>();
         Eventos = new ObservableCollection<EventoSimulacion>();
 
-        NuevaPartidaCommand = new RelayCommand(CrearNuevaPartida);
-        CargarPartidaCommand = new RelayCommand(CargarPartida);
-        GuardarPartidaCommand = new RelayCommand(async _ => await GuardarPartida(), _ => PartidaActual != null);
-        EjecutarRondaCommand = new RelayCommand(EjecutarRonda, _ => PartidaActual != null);
-        SalirCommand = new RelayCommand(Salir);
+        NuevaPartidaCommand = new RelayCommand(_ => { SoundManager.PlayClick(); CrearNuevaPartida(_); });
+        CargarPartidaCommand = new RelayCommand(_ => { SoundManager.PlayClick(); CargarPartida(_); });
+        GuardarPartidaCommand = new RelayCommand(async _ => { SoundManager.PlayClick(); await GuardarPartida(); }, _ => PartidaActual != null);
+        EjecutarRondaCommand = new RelayCommand(_ => { EjecutarRonda(_); }, _ => PartidaActual != null);
+        SalirCommand = new RelayCommand(_ => { SoundManager.PlayClick(); Salir(_); });
+        
+        PaginaAnteriorCommand = new RelayCommand(_ => { SoundManager.PlayClick(); IrPaginaAnterior(); }, _ => PuedeIrPaginaAnterior);
+        PaginaSiguienteCommand = new RelayCommand(_ => { SoundManager.PlayClick(); IrPaginaSiguiente(); }, _ => PuedeIrPaginaSiguiente);
+        CambiarFiltroCommand = new RelayCommand(_ => { SoundManager.PlayClick(); CambiarFiltro(_); });
+
+        CargarPartidaAutomatica();
+    }
+
+    public ObservableCollection<EventoSimulacion> Eventos { get; }
+    
+    public ICommand PaginaAnteriorCommand { get; }
+    public ICommand PaginaSiguienteCommand { get; }
+    public ICommand CambiarFiltroCommand { get; }
+
+    private async void CargarPartidaAutomatica()
+    {
+        if (File.Exists(_archivoAutoGuardado))
+        {
+            var (partida, mensaje) = await _persistenceService.CargarPartidaAsync(_archivoAutoGuardado);
+            if (partida != null)
+            {
+                PartidaActual = partida;
+                ActualizarColecciones();
+                MensajeEstado = $"Partida '{PartidaActual.Nombre}' cargada - Ronda {PartidaActual.RondaActual}";
+                return;
+            }
+        }
+        MensajeEstado = "Sin partida cargada - Crea una nueva";
+    }
+
+    private async Task AutoGuardarAsync()
+    {
+        if (PartidaActual == null) return;
+        Directory.CreateDirectory(_directorioGuardado);
+        await _persistenceService.GuardarPartidaAsync(PartidaActual, _archivoAutoGuardado);
     }
 
     public Partida? PartidaActual
@@ -62,19 +115,164 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<Criatura> Criaturas { get; }
     public ObservableCollection<Enclave> Enclaves { get; }
     public ObservableCollection<Recurso> Recursos { get; }
+    public ObservableCollection<RecursoAgrupado> RecursosAgrupados { get; }
+    public ObservableCollection<RecursoAgrupado> RecursosPaginados { get; private set; }
     public ObservableCollection<Instalacion> Instalaciones { get; }
-    public ObservableCollection<EventoSimulacion> Eventos { get; }
+    
+    private int _paginaRecursosActual = 1;
+    private int _recursosTotalPaginas = 1;
+    private const int RecursosPorPagina = 6;
+    
+    public string PaginaRecursosTexto => $"Pagina {_paginaRecursosActual} de {_recursosTotalPaginas}";
 
     public ICommand NuevaPartidaCommand { get; }
     public ICommand CargarPartidaCommand { get; }
     public ICommand GuardarPartidaCommand { get; }
     public ICommand EjecutarRondaCommand { get; }
     public ICommand SalirCommand { get; }
+    
+    public int PaginaActual
+    {
+        get => _paginaActual;
+        set
+        {
+            if (SetProperty(ref _paginaActual, value))
+            {
+                OnPropertyChanged(nameof(PaginaTexto));
+                OnPropertyChanged(nameof(PuedeIrPaginaAnterior));
+                OnPropertyChanged(nameof(PuedeIrPaginaSiguiente));
+            }
+        }
+    }
+    
+    public int TotalPaginas
+    {
+        get
+        {
+            var filtrados = _filtroActual == null 
+                ? _todosLosEventos.Count 
+                : _todosLosEventos.Count(e => e.Tipo == _filtroActual);
+            return filtrados == 0 ? 0 : (int)Math.Ceiling(filtrados / (double)EventosPorPagina);
+        }
+    }
+    
+    public string PaginaTexto => TotalPaginas == 0 ? "Sin eventos" : $"Pagina {_paginaActual} de {TotalPaginas}";
+    
+    public bool PuedeIrPaginaAnterior => _paginaActual > 1 && TotalPaginas > 0;
+    public bool PuedeIrPaginaSiguiente => _paginaActual < TotalPaginas && TotalPaginas > 0;
+    
+    public int TotalEventosFiltrados => _filtroActual == null 
+        ? _todosLosEventos.Count 
+        : _todosLosEventos.Count(e => e.Tipo == _filtroActual);
 
-    private void CrearNuevaPartida(object? parameter)
+    public event Action? RondaCompletada;
+    public event Action? PartidaActualizada;
+    
+    private bool HayEventosEnPaginaActual()
+    {
+        if (TotalEventosFiltrados == 0) return false;
+        
+        int inicio = (_paginaActual) * EventosPorPagina;
+        return inicio < TotalEventosFiltrados;
+    }
+    
+    public string FiltroActualTexto => _filtroActual == null ? "TODOS" : _filtroActual.ToString().ToUpper();
+    
+    public int TotalEventos => _filtroActual == null 
+        ? _todosLosEventos.Count 
+        : _todosLosEventos.Count(e => e.Tipo == _filtroActual);
+    public string TotalEventosTexto => $"Total: {TotalEventos} eventos";
+    
+    private void IrPaginaAnterior()
+    {
+        if (PaginaActual > 1)
+        {
+            PaginaActual--;
+            ActualizarEventosVisibles();
+        }
+    }
+    
+    private void IrPaginaSiguiente()
+    {
+        if (PaginaActual < TotalPaginas && HayEventosEnPaginaSiguiente())
+        {
+            PaginaActual++;
+            ActualizarEventosVisibles();
+        }
+    }
+    
+    private bool HayEventosEnPaginaSiguiente()
+    {
+        int inicio = (_paginaActual + 1 - 1) * EventosPorPagina;
+        return inicio < TotalEventosFiltrados;
+    }
+    
+    private void CambiarFiltro(object? parameter)
+    {
+        if (parameter is string filtro)
+        {
+            if (filtro == "TODOS")
+            {
+                _filtroActual = null;
+            }
+            else if (Enum.TryParse<TipoEvento>(filtro, out var tipo))
+            {
+                _filtroActual = tipo;
+            }
+            
+            PaginaActual = 1;
+            ActualizarEventosVisibles();
+            OnPropertyChanged(nameof(FiltroActualTexto));
+            OnPropertyChanged(nameof(TotalPaginas));
+            OnPropertyChanged(nameof(TotalEventosTexto));
+        }
+    }
+    
+    private void ActualizarEventosFiltrados()
+    {
+        Eventos.Clear();
+        var filtrados = _filtroActual == null 
+            ? _todosLosEventos 
+            : _todosLosEventos.Where(e => e.Tipo == _filtroActual).ToList();
+        
+        int inicio = (PaginaActual - 1) * EventosPorPagina;
+        var pagina = filtrados.Skip(inicio).Take(EventosPorPagina).ToList();
+        
+        foreach (var evt in pagina)
+        {
+            Eventos.Add(evt);
+        }
+    }
+    
+    private void ActualizarEventosVisibles()
+    {
+        var filtrados = _filtroActual == null 
+            ? _todosLosEventos.ToList()
+            : _todosLosEventos.Where(e => e.Tipo == _filtroActual).ToList();
+        
+        Eventos.Clear();
+        int inicio = (PaginaActual - 1) * EventosPorPagina;
+        var pagina = filtrados.Skip(inicio).Take(EventosPorPagina).ToList();
+        
+        foreach (var evt in pagina)
+        {
+            Eventos.Add(evt);
+        }
+        
+        OnPropertyChanged(nameof(PaginaTexto));
+        OnPropertyChanged(nameof(TotalPaginas));
+        OnPropertyChanged(nameof(TotalEventos));
+        OnPropertyChanged(nameof(TotalEventosTexto));
+        OnPropertyChanged(nameof(PuedeIrPaginaAnterior));
+        OnPropertyChanged(nameof(PuedeIrPaginaSiguiente));
+    }
+
+    private async void CrearNuevaPartida(object? parameter)
     {
         try
         {
+            LimpiarTodo();
+            
             var dialog = new CrearPartidaWindow();
             if (dialog.ShowDialog() == true)
             {
@@ -92,6 +290,7 @@ public class MainViewModel : ViewModelBase
 
                 PartidaActual = partida;
                 ActualizarColecciones();
+                await AutoGuardarAsync();
 
                 MensajeEstado = $"Partida '{PartidaActual.Nombre}' creada - Ronda {PartidaActual.RondaActual}";
                 System.Diagnostics.Debug.WriteLine("CrearNuevaPartida: Partida creada correctamente");
@@ -103,6 +302,94 @@ public class MainViewModel : ViewModelBase
             System.Diagnostics.Debug.WriteLine(ex.StackTrace);
             MensajeEstado = $"Error al crear partida: {ex.Message}";
         }
+    }
+
+    public void CrearNuevaPartidaDirecta()
+    {
+        CrearPartidaConNombre("Nueva Partida");
+    }
+
+    public void CrearPartidaConNombre(string nombre)
+    {
+        try
+        {
+            LimpiarTodo();
+            
+            var partida = new Partida
+            {
+                Nombre = string.IsNullOrWhiteSpace(nombre) ? "Partida sin nombre" : nombre,
+                Mapa = GenerarMapaAleatorio(20, 20)
+            };
+
+            PartidaActual = partida;
+
+            foreach (var cri in GenerarCriaturasIniciales())
+            {
+                var pos = AjustarPosicionSiEsRoca(partida.Mapa, cri.PosicionX, cri.PosicionY);
+                cri.PosicionX = pos.x;
+                cri.PosicionY = pos.y;
+                partida.Criaturas.Add(cri);
+            }
+            foreach (var enc in GenerarEnclavesIniciales())
+            {
+                var pos = AjustarPosicionSiEsRoca(partida.Mapa, enc.PosicionX, enc.PosicionY);
+                enc.PosicionX = pos.x;
+                enc.PosicionY = pos.y;
+                partida.Enclaves.Add(enc);
+            }
+            partida.Recursos.AddRange(GenerarRecursosIniciales());
+            partida.Instalaciones.AddRange(GenerarInstalacionesIniciales(partida.Enclaves));
+
+            ActualizarColecciones();
+            ActualizarPaginacion();
+
+            MensajeEstado = $"Partida '{PartidaActual.Nombre}' creada - Ronda {PartidaActual.RondaActual}";
+            System.Diagnostics.Debug.WriteLine($"CrearPartidaConNombre: Partida '{nombre}' creada correctamente");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"CrearPartidaConNombre ERROR: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+            MensajeEstado = $"Error al crear partida: {ex.Message}";
+        }
+    }
+
+    private (int x, int y) AjustarPosicionSiEsRoca(Mapa mapa, int x, int y)
+    {
+        if (mapa.Celdas[y - 1][x - 1] != TipoTerreno.Roca)
+        {
+            return (x, y);
+        }
+        for (int ny = 1; ny <= mapa.Alto; ny++)
+        {
+            for (int nx = 1; nx <= mapa.Ancho; nx++)
+            {
+                if (mapa.Celdas[ny - 1][nx - 1] != TipoTerreno.Roca)
+                {
+                    return (nx, ny);
+                }
+            }
+        }
+        return (x, y);
+    }
+
+    private void LimpiarTodo()
+    {
+        Eventos.Clear();
+        _todosLosEventos.Clear();
+        _filtroActual = null;
+        _paginaActual = 1;
+        Criaturas.Clear();
+        Enclaves.Clear();
+        Recursos.Clear();
+        Instalaciones.Clear();
+        if (_partidaActual != null)
+        {
+            _partidaActual.HistorialRondas.Clear();
+        }
+        _partidaActual = null;
+        ActualizarPaginacion();
+        OnPropertyChanged(nameof(FiltroActualTexto));
     }
 
     private Mapa GenerarMapaAleatorio(int ancho, int alto)
@@ -117,9 +404,11 @@ public class MainViewModel : ViewModelBase
             {
                 var tipo = random.Next(100) switch
                 {
-                    < 10 => TipoTerreno.Roca,
-                    < 20 => TipoTerreno.ArenaMovida,
-                    < 30 => TipoTerreno.Especia,
+                    < 8 => TipoTerreno.Roca,
+                    < 15 => TipoTerreno.ArenaMovida,
+                    < 23 => TipoTerreno.Melange,
+                    < 28 => TipoTerreno.EspeciaRosa,
+                    < 30 => TipoTerreno.EspeciaNegra,
                     _ => TipoTerreno.Desierto
                 };
                 fila.Add(tipo);
@@ -131,103 +420,79 @@ public class MainViewModel : ViewModelBase
 
     private List<Criatura> GenerarCriaturasIniciales()
     {
-        var random = Random.Shared;
-        var criaturas = new List<Criatura>();
-        var posicionesXUsadas = new HashSet<int>();
-        var posicionesYUsadas = new HashSet<int>();
-
-        int ObtenerPosicionX()
+        return new List<Criatura>
         {
-            int pos;
-            do { pos = random.Next(20); } while (posicionesXUsadas.Contains(pos));
-            posicionesXUsadas.Add(pos);
-            return pos;
-        }
-
-        int ObtenerPosicionY()
-        {
-            int pos;
-            do { pos = random.Next(20); } while (posicionesYUsadas.Contains(pos));
-            posicionesYUsadas.Add(pos);
-            return pos;
-        }
-
-        criaturas.Add(new Criatura
-        {
-            Nombre = "Gusano de arena juvenil",
-            Tipo = TipoCriatura.GusanoArenaJuvenil,
-            Medio = MedioCriatura.Subterraneo,
-            Rol = RolCriatura.Depredador,
-            EdadAdulta = 24,
-            ApetitoBase = 5,
-            Vida = 100,
-            VidaMaxima = 100,
-            Ataque = 25,
-            PosicionX = ObtenerPosicionX(),
-            PosicionY = ObtenerPosicionY()
-        });
-
-        criaturas.Add(new Criatura
-        {
-            Nombre = "Tigre laza",
-            Tipo = TipoCriatura.TigreLaza,
-            Medio = MedioCriatura.Desierto,
-            Rol = RolCriatura.Depredador,
-            EdadAdulta = 38,
-            ApetitoBase = 8,
-            Vida = 80,
-            VidaMaxima = 80,
-            Ataque = 30,
-            PosicionX = ObtenerPosicionX(),
-            PosicionY = ObtenerPosicionY()
-        });
-
-        criaturas.Add(new Criatura
-        {
-            Nombre = "Muad'Dib",
-            Tipo = TipoCriatura.MuadDib,
-            Medio = MedioCriatura.Desierto,
-            Rol = RolCriatura.Recolector,
-            EdadAdulta = 12,
-            ApetitoBase = 2,
-            Vida = 50,
-            VidaMaxima = 50,
-            Ataque = 15,
-            PosicionX = ObtenerPosicionX(),
-            PosicionY = ObtenerPosicionY()
-        });
-
-        criaturas.Add(new Criatura
-        {
-            Nombre = "Halcon del desierto",
-            Tipo = TipoCriatura.HalconDesierto,
-            Medio = MedioCriatura.Aereo,
-            Rol = RolCriatura.Depredador,
-            EdadAdulta = 16,
-            ApetitoBase = 2,
-            Vida = 40,
-            VidaMaxima = 40,
-            Ataque = 20,
-            PosicionX = ObtenerPosicionX(),
-            PosicionY = ObtenerPosicionY()
-        });
-
-        criaturas.Add(new Criatura
-        {
-            Nombre = "Trucha de arena",
-            Tipo = TipoCriatura.TruchaArena,
-            Medio = MedioCriatura.Subterraneo,
-            Rol = RolCriatura.Recolector,
-            EdadAdulta = 42,
-            ApetitoBase = 10,
-            Vida = 60,
-            VidaMaxima = 60,
-            Ataque = 10,
-            PosicionX = ObtenerPosicionX(),
-            PosicionY = ObtenerPosicionY()
-        });
-
-        return criaturas;
+            new()
+            {
+                Nombre = "Gusano de arena juvenil",
+                Tipo = TipoCriatura.GusanoArenaJuvenil,
+                Medio = MedioCriatura.Subterraneo,
+                Rol = RolCriatura.Depredador,
+                EdadAdulta = 24,
+                ApetitoBase = 5,
+                Vida = 100,
+                VidaMaxima = 100,
+                Ataque = 25,
+                PosicionX = 6,
+                PosicionY = 6
+            },
+            new()
+            {
+                Nombre = "Tigre laza",
+                Tipo = TipoCriatura.TigreLaza,
+                Medio = MedioCriatura.Desierto,
+                Rol = RolCriatura.Depredador,
+                EdadAdulta = 38,
+                ApetitoBase = 8,
+                Vida = 80,
+                VidaMaxima = 80,
+                Ataque = 30,
+                PosicionX = 16,
+                PosicionY = 9
+            },
+            new()
+            {
+                Nombre = "Muad'Dib",
+                Tipo = TipoCriatura.MuadDib,
+                Medio = MedioCriatura.Desierto,
+                Rol = RolCriatura.Recolector,
+                EdadAdulta = 12,
+                ApetitoBase = 2,
+                Vida = 50,
+                VidaMaxima = 50,
+                Ataque = 15,
+                PosicionX = 11,
+                PosicionY = 13
+            },
+            new()
+            {
+                Nombre = "Halcon del desierto",
+                Tipo = TipoCriatura.HalconDesierto,
+                Medio = MedioCriatura.Aereo,
+                Rol = RolCriatura.Depredador,
+                EdadAdulta = 16,
+                ApetitoBase = 2,
+                Vida = 40,
+                VidaMaxima = 40,
+                Ataque = 20,
+                PosicionX = 4,
+                PosicionY = 16
+            },
+            new()
+            {
+                Nombre = "Trucha de arena",
+                Tipo = TipoCriatura.TruchaArena,
+                Medio = MedioCriatura.Subterraneo,
+                Rol = RolCriatura.Recolector,
+                EdadAdulta = 42,
+                ApetitoBase = 10,
+                Vida = 60,
+                VidaMaxima = 60,
+                Ataque = 10,
+                PosicionX = 19,
+                PosicionY = 4
+            }
+        };
     }
 
     private List<Enclave> GenerarEnclavesIniciales()
@@ -246,8 +511,8 @@ public class MainViewModel : ViewModelBase
                 PrecioEntrada = 0,
                 PrecioSalida = 0,
                 Nivel = NivelEnclave.Medio,
-                PosicionX = 3,
-                PosicionY = 10
+                PosicionX = 4,
+                PosicionY = 11
             },
             new()
             {
@@ -261,8 +526,8 @@ public class MainViewModel : ViewModelBase
                 PrecioEntrada = 1000,
                 PrecioSalida = 0,
                 Nivel = NivelEnclave.Alto,
-                PosicionX = 10,
-                PosicionY = 5
+                PosicionX = 11,
+                PosicionY = 6
             },
             new()
             {
@@ -276,8 +541,8 @@ public class MainViewModel : ViewModelBase
                 PrecioEntrada = 2000,
                 PrecioSalida = 0,
                 Nivel = NivelEnclave.Bajo,
-                PosicionX = 17,
-                PosicionY = 5
+                PosicionX = 18,
+                PosicionY = 6
             },
             new()
             {
@@ -291,8 +556,8 @@ public class MainViewModel : ViewModelBase
                 PrecioEntrada = 3000,
                 PrecioSalida = 0,
                 Nivel = NivelEnclave.Medio,
-                PosicionX = 10,
-                PosicionY = 15
+                PosicionX = 11,
+                PosicionY = 16
             }
         };
     }
@@ -301,30 +566,93 @@ public class MainViewModel : ViewModelBase
     {
         var random = Random.Shared;
         var recursos = new List<Recurso>();
+        var mapa = _partidaActual!.Mapa;
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 12; i++)
         {
+            var pos = EncontrarCeldaTerreno(mapa, TipoTerreno.Melange, recursos);
             recursos.Add(new Recurso
             {
-                Tipo = TipoRecurso.Especia,
-                Cantidad = random.Next(50, 200),
-                PosicionX = random.Next(20),
-                PosicionY = random.Next(20)
+                Tipo = TipoRecurso.Melange,
+                Cantidad = random.Next(50, 150),
+                PosicionX = pos.x,
+                PosicionY = pos.y
+            });
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            var pos = EncontrarCeldaTerreno(mapa, TipoTerreno.EspeciaRosa, recursos);
+            recursos.Add(new Recurso
+            {
+                Tipo = TipoRecurso.EspeciaRosa,
+                Cantidad = random.Next(30, 100),
+                PosicionX = pos.x,
+                PosicionY = pos.y
+            });
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            var pos = EncontrarCeldaTerreno(mapa, TipoTerreno.EspeciaNegra, recursos);
+            recursos.Add(new Recurso
+            {
+                Tipo = TipoRecurso.EspeciaNegra,
+                Cantidad = random.Next(10, 50),
+                PosicionX = pos.x,
+                PosicionY = pos.y
             });
         }
 
         for (int i = 0; i < 5; i++)
         {
+            var pos = EncontrarCeldaTerreno(mapa, TipoTerreno.Desierto, recursos);
             recursos.Add(new Recurso
             {
                 Tipo = TipoRecurso.Agua,
                 Cantidad = random.Next(20, 100),
-                PosicionX = random.Next(20),
-                PosicionY = random.Next(20)
+                PosicionX = pos.x,
+                PosicionY = pos.y
             });
         }
 
         return recursos;
+    }
+
+    private (int x, int y) EncontrarCeldaTerreno(Mapa mapa, TipoTerreno tipoBuscado, List<Recurso> recursosExistentes)
+    {
+        var random = Random.Shared;
+        var posicionesUsadas = recursosExistentes.Select(r => (r.PosicionX - 1, r.PosicionY - 1)).ToHashSet();
+
+        var celdasValidas = new List<(int x, int y)>();
+        for (int y = 0; y < mapa.Alto; y++)
+        {
+            for (int x = 0; x < mapa.Ancho; x++)
+            {
+                if (mapa.Celdas[y][x] == tipoBuscado && !posicionesUsadas.Contains((x, y)))
+                {
+                    celdasValidas.Add((x + 1, y + 1));
+                }
+            }
+        }
+
+        if (celdasValidas.Count > 0)
+        {
+            return celdasValidas[random.Next(celdasValidas.Count)];
+        }
+
+        for (int y = 0; y < mapa.Alto; y++)
+        {
+            for (int x = 0; x < mapa.Ancho; x++)
+            {
+                if (mapa.Celdas[y][x] != TipoTerreno.Roca && !posicionesUsadas.Contains((x, y)))
+                {
+                    return (x + 1, y + 1);
+                }
+            }
+        }
+
+        return (random.Next(1, mapa.Ancho + 1), random.Next(1, mapa.Alto + 1));
     }
 
     private List<Instalacion> GenerarInstalacionesIniciales(List<Enclave> enclaves)
@@ -406,6 +734,7 @@ public class MainViewModel : ViewModelBase
 
         if (dialog.ShowDialog() == true)
         {
+            LimpiarTodo();
             var (partida, mensaje) = await _persistenceService.CargarPartidaAsync(dialog.FileName);
             if (partida != null)
             {
@@ -438,24 +767,59 @@ public class MainViewModel : ViewModelBase
             MensajeEstado = mensaje;
         }
     }
+    
+    public Partida? ObtenerPartidaActual()
+    {
+        return PartidaActual;
+    }
+    
+    public void CargarPartidaDesde(Partida partida)
+    {
+        PartidaActual = partida;
+        ActualizarColecciones();
+        ActualizarPaginacion();
+        ActualizarInventario();
+        _todosLosEventos.Clear();
+        Eventos.Clear();
+        foreach (var ronda in partida.HistorialRondas)
+        {
+            foreach (var evt in ronda.Eventos)
+            {
+                _todosLosEventos.Insert(0, evt);
+            }
+        }
+        ActualizarEventosVisibles();
+        OnPropertyChanged(nameof(PaginaTexto));
+        OnPropertyChanged(nameof(TotalPaginas));
+        OnPropertyChanged(nameof(TotalEventos));
+        OnPropertyChanged(nameof(TotalEventosTexto));
+        MensajeEstado = $"Partida '{PartidaActual.Nombre}' cargada - Ronda {PartidaActual.RondaActual}";
+    }
 
-    private void EjecutarRonda(object? parameter)
+    private async void EjecutarRonda(object? parameter)
     {
         if (PartidaActual == null) return;
 
         try
         {
             System.Diagnostics.Debug.WriteLine("EjecutarRonda: Iniciando...");
-            var ronda = _simulationService.EjecutarRonda(PartidaActual);
-            System.Diagnostics.Debug.WriteLine($"EjecutarRonda: Ronda {ronda.Numero} completada");
             
-            Eventos.Clear();
+            var ronda = _simulationService.EjecutarRonda(PartidaActual);
+            System.Diagnostics.Debug.WriteLine($"EjecutarRonda: Ronda {ronda.Numero} completada, Eventos en ronda: {ronda.Eventos.Count}");
+            
             foreach (var evt in ronda.Eventos)
             {
-                Eventos.Add(evt);
+                _todosLosEventos.Insert(0, evt);
             }
 
             ActualizarColecciones();
+            RondaCompletada?.Invoke();
+            PartidaActualizada?.Invoke();
+            ActualizarInventario();
+            ActualizarEventosFiltrados();
+            ActualizarPaginacion();
+            await AutoGuardarAsync();
+            
             MensajeEstado = $"Ronda {ronda.Numero} completada - Eventos: {ronda.Eventos.Count}";
             System.Diagnostics.Debug.WriteLine("EjecutarRonda: Finalizado correctamente");
         }
@@ -463,8 +827,32 @@ public class MainViewModel : ViewModelBase
         {
             System.Diagnostics.Debug.WriteLine($"EjecutarRonda ERROR: {ex.Message}");
             System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+            MessageBox.Show($"Error al ejecutar ronda: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             MensajeEstado = $"Error: {ex.Message}";
         }
+    }
+    
+    private void ActualizarPaginacion()
+    {
+        _paginaActual = 1;
+        OnPropertyChanged(nameof(PaginaActual));
+        OnPropertyChanged(nameof(TotalPaginas));
+        OnPropertyChanged(nameof(PaginaTexto));
+        OnPropertyChanged(nameof(TotalEventos));
+        OnPropertyChanged(nameof(TotalEventosTexto));
+        OnPropertyChanged(nameof(PuedeIrPaginaAnterior));
+        OnPropertyChanged(nameof(PuedeIrPaginaSiguiente));
+    }
+
+    public string EspeciaTotal => PartidaActual?.InventarioGlobal.Especia.ToString() ?? "0";
+    public string AguaTotal => PartidaActual?.Recursos.Where(r => r.Tipo == TipoRecurso.Agua && !r.Extraido).Sum(r => r.Cantidad).ToString() ?? "0";
+    public string CriaturasVivas => PartidaActual?.Criaturas.Count(c => c.Activo).ToString() ?? "0";
+
+    private void ActualizarInventario()
+    {
+        OnPropertyChanged(nameof(EspeciaTotal));
+        OnPropertyChanged(nameof(AguaTotal));
+        OnPropertyChanged(nameof(CriaturasVivas));
     }
 
     private void ActualizarColecciones()
@@ -486,11 +874,91 @@ public class MainViewModel : ViewModelBase
                 Recursos.Add(r);
             foreach (var i in PartidaActual.Instalaciones)
                 Instalaciones.Add(i);
+            
+            ActualizarRecursosAgrupados();
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error en ActualizarColecciones: {ex.Message}");
             System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+        }
+    }
+    
+    private void ActualizarRecursosAgrupados()
+    {
+        RecursosAgrupados.Clear();
+        
+        if (PartidaActual == null) return;
+        
+        var recursosNoExtraidos = PartidaActual.Recursos.Where(r => !r.Extraido).ToList();
+        
+        var agrupados = recursosNoExtraidos
+            .GroupBy(r => r.Tipo)
+            .Select(g => new RecursoAgrupado
+            {
+                Tipo = g.Key,
+                CantidadTotal = g.Sum(r => r.Cantidad),
+                CantidadYacimientos = g.Count(),
+                Regeneracion = g.Key switch
+                {
+                    TipoRecurso.Melange => 10,
+                    TipoRecurso.EspeciaRosa => 8,
+                    TipoRecurso.EspeciaNegra => 5,
+                    _ => 0
+                },
+                Rareza = g.Key switch
+                {
+                    TipoRecurso.Melange => "Comun",
+                    TipoRecurso.EspeciaRosa => "Rara",
+                    TipoRecurso.EspeciaNegra => "Legendaria",
+                    TipoRecurso.Agua => "Escasa",
+                    TipoRecurso.Materiales => "Comun",
+                    TipoRecurso.Energia => "Comun",
+                    _ => ""
+                }
+            })
+            .OrderBy(r => r.Tipo)
+            .ToList();
+        
+        foreach (var recurso in agrupados)
+            RecursosAgrupados.Add(recurso);
+        
+        _recursosTotalPaginas = RecursosAgrupados.Count == 0 ? 1 : (int)Math.Ceiling(RecursosAgrupados.Count / (double)RecursosPorPagina);
+        if (_paginaRecursosActual > _recursosTotalPaginas) _paginaRecursosActual = _recursosTotalPaginas;
+        if (_paginaRecursosActual < 1) _paginaRecursosActual = 1;
+        
+        ActualizarRecursosPaginados();
+        OnPropertyChanged(nameof(PaginaRecursosTexto));
+    }
+    
+    private void ActualizarRecursosPaginados()
+    {
+        RecursosPaginados.Clear();
+        
+        int inicio = (_paginaRecursosActual - 1) * RecursosPorPagina;
+        var pagina = RecursosAgrupados.Skip(inicio).Take(RecursosPorPagina);
+        
+        foreach (var recurso in pagina)
+            RecursosPaginados.Add(recurso);
+    }
+    
+    public void PaginaAnteriorRecursos()
+    {
+        if (_paginaRecursosActual > 1)
+        {
+            _paginaRecursosActual--;
+            ActualizarRecursosPaginados();
+            OnPropertyChanged(nameof(PaginaRecursosTexto));
+        }
+    }
+    
+    public void PaginaSiguienteRecursos()
+    {
+        if (_paginaRecursosActual < _recursosTotalPaginas)
+        {
+            _paginaRecursosActual++;
+            ActualizarRecursosPaginados();
+            OnPropertyChanged(nameof(PaginaRecursosTexto));
         }
     }
 
@@ -516,8 +984,12 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private void Salir(object? parameter)
+    private async void Salir(object? parameter)
     {
+        if (PartidaActual != null)
+        {
+            await AutoGuardarAsync();
+        }
         Application.Current.Shutdown();
     }
 }

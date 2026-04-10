@@ -15,13 +15,24 @@ public class SimulationService : ISimulationService
         {
             partida.RondaActual = ronda.Numero;
 
+            var eventosCombate = new List<EventoSimulacion>();
+            var eventosMovimiento = new List<EventoSimulacion>();
+            var eventosRecursos = new List<EventoSimulacion>();
+            var eventosEnclaves = new List<EventoSimulacion>();
+            var eventosNacimiento = new List<EventoSimulacion>();
+
             foreach (var criatura in partida.Criaturas.Where(c => c.Activo).ToList())
             {
                 try
                 {
-                    var evento = SimularComportamientoCriatura(partida, criatura);
+                    var (evento, esCombate) = SimularComportamientoCriatura(partida, criatura);
                     if (evento != null)
-                        ronda.Eventos.Add(evento);
+                    {
+                        if (esCombate)
+                            eventosCombate.Add(evento);
+                        else
+                            eventosMovimiento.Add(evento);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -33,13 +44,31 @@ public class SimulationService : ISimulationService
             {
                 try
                 {
-                    if (recurso.Tipo == TipoRecurso.Especia && _random.Next(100) < 10)
+                    if (recurso.Tipo == TipoRecurso.Melange && _random.Next(100) < 10)
                     {
                         recurso.Cantidad += 10;
-                        ronda.Eventos.Add(new EventoSimulacion
+                        eventosRecursos.Add(new EventoSimulacion
                         {
                             Tipo = TipoEvento.RecursoExtraido,
-                            Descripcion = $"Especia regenero +10 unidades"
+                            Descripcion = $"🟠 Melange regenero +10 en ({recurso.PosicionX},{recurso.PosicionY})"
+                        });
+                    }
+                    else if (recurso.Tipo == TipoRecurso.EspeciaRosa && _random.Next(100) < 8)
+                    {
+                        recurso.Cantidad += 8;
+                        eventosRecursos.Add(new EventoSimulacion
+                        {
+                            Tipo = TipoEvento.RecursoExtraido,
+                            Descripcion = $"🌸 Especia Rosa regenero +8 en ({recurso.PosicionX},{recurso.PosicionY})"
+                        });
+                    }
+                    else if (recurso.Tipo == TipoRecurso.EspeciaNegra && _random.Next(100) < 5)
+                    {
+                        recurso.Cantidad += 5;
+                        eventosRecursos.Add(new EventoSimulacion
+                        {
+                            Tipo = TipoEvento.RecursoExtraido,
+                            Descripcion = $"⬛ Especia Negra regenero +5 en ({recurso.PosicionX},{recurso.PosicionY})"
                         });
                     }
                 }
@@ -49,8 +78,14 @@ public class SimulationService : ISimulationService
                 }
             }
 
-            SimularInstalacionesAclimatacion(partida, ronda);
-            SimularVisitantesEnclaves(partida, ronda);
+            SimularInstalacionesAclimatacion(partida, eventosNacimiento);
+            SimularVisitantesEnclaves(partida, eventosEnclaves);
+
+            ronda.Eventos.AddRange(eventosCombate);
+            ronda.Eventos.AddRange(eventosMovimiento);
+            ronda.Eventos.AddRange(eventosRecursos);
+            ronda.Eventos.AddRange(eventosNacimiento);
+            ronda.Eventos.AddRange(eventosEnclaves);
 
             partida.HistorialRondas.Add(ronda);
         }
@@ -63,7 +98,7 @@ public class SimulationService : ISimulationService
         return ronda;
     }
 
-    private void SimularInstalacionesAclimatacion(Partida partida, Ronda ronda)
+    private void SimularInstalacionesAclimatacion(Partida partida, List<EventoSimulacion> eventos)
     {
         foreach (var instalacion in partida.Instalaciones.Where(i => i.Tipo == TipoInstalacion.Aclimatacion))
         {
@@ -72,14 +107,14 @@ public class SimulationService : ISimulationService
 
             if (capacidadLibre > 0 && _random.Next(100) < 20)
             {
-                var nuevaCriatura = GenerarCriaturaCompatible(instalacion);
+                var nuevaCriatura = GenerarCriaturaCompatible(instalacion, partida);
                 if (nuevaCriatura != null)
                 {
                     partida.Criaturas.Add(nuevaCriatura);
-                    ronda.Eventos.Add(new EventoSimulacion
+                    eventos.Add(new EventoSimulacion
                     {
                         Tipo = TipoEvento.InstalacionConstruida,
-                        Descripcion = $"Nueva criatura nacida en {instalacion.Codigo}: {nuevaCriatura.Nombre}",
+                        Descripcion = $"🐣 {nuevaCriatura.Nombre} nacio en {instalacion.Codigo}",
                         EntidadId = nuevaCriatura.Id.ToString()
                     });
                 }
@@ -87,7 +122,7 @@ public class SimulationService : ISimulationService
         }
     }
 
-    private Criatura? GenerarCriaturaCompatible(Instalacion instalacion)
+    private Criatura? GenerarCriaturaCompatible(Instalacion instalacion, Partida partida)
     {
         var tiposDisponibles = new List<(TipoCriatura Tipo, string Nombre, MedioCriatura Medio)>
         {
@@ -111,6 +146,18 @@ public class SimulationService : ISimulationService
 
         var infoCriatura = ObtenerInfoCriatura(tipoCompatible.Tipo);
 
+        int nuevaX, nuevaY;
+        var posicionesOcupadas = partida.Criaturas
+            .Select(c => (c.PosicionX, c.PosicionY))
+            .ToHashSet();
+        
+        do
+        {
+            nuevaX = _random.Next(1, partida.Mapa.Ancho + 1);
+            nuevaY = _random.Next(1, partida.Mapa.Alto + 1);
+        } while (posicionesOcupadas.Contains((nuevaX, nuevaY)) || 
+                 partida.Mapa.Celdas[nuevaY - 1][nuevaX - 1] == TipoTerreno.Roca);
+        
         return new Criatura
         {
             Nombre = $"{tipoCompatible.Nombre} (clon)",
@@ -122,8 +169,8 @@ public class SimulationService : ISimulationService
             Vida = infoCriatura.Vida,
             VidaMaxima = infoCriatura.Vida,
             Ataque = infoCriatura.Ataque,
-            PosicionX = 10,
-            PosicionY = 10,
+            PosicionX = nuevaX,
+            PosicionY = nuevaY,
             Activo = true
         };
     }
@@ -141,7 +188,7 @@ public class SimulationService : ISimulationService
         };
     }
 
-    private void SimularVisitantesEnclaves(Partida partida, Ronda ronda)
+    private void SimularVisitantesEnclaves(Partida partida, List<EventoSimulacion> eventos)
     {
         double saludMedia = CalcularSaludMediaCriaturas(partida.Criaturas);
 
@@ -173,22 +220,19 @@ public class SimulationService : ISimulationService
                 }
             }
 
-            if (llegan > 0 || abandonan > 0 || donacionTotal > 0)
+            string descripcion = $"🏛️ {enclave.Nombre}: +{llegan} / -{abandonan} | Visitantes: {enclave.VisitantesActuales}";
+            if (donacionTotal > 0)
             {
-                string descripcion = $"{enclave.Nombre}: {llegan} llegan, {abandonan} abandonan. Total: {enclave.VisitantesActuales}";
-                if (donacionTotal > 0)
-                {
-                    partida.InventarioGlobal.Especia += donacionTotal;
-                    descripcion += $" | Donaciones: +{donacionTotal} especias";
-                }
-
-                ronda.Eventos.Add(new EventoSimulacion
-                {
-                    Tipo = TipoEvento.RecursoExtraido,
-                    Descripcion = descripcion,
-                    EntidadId = enclave.Id.ToString()
-                });
+                partida.InventarioGlobal.Especia += donacionTotal;
+                descripcion += $" | 🟠 +{donacionTotal} especias";
             }
+
+            eventos.Add(new EventoSimulacion
+            {
+                Tipo = TipoEvento.Ganancias,
+                Descripcion = descripcion,
+                EntidadId = enclave.Id.ToString()
+            });
         }
     }
 
@@ -203,13 +247,29 @@ public class SimulationService : ISimulationService
         return sumaSalud / criaturas.Count;
     }
 
-    private EventoSimulacion? SimularComportamientoCriatura(Partida partida, Criatura criatura)
+    private (EventoSimulacion? Evento, bool EsCombate) SimularComportamientoCriatura(Partida partida, Criatura criatura)
     {
+        int posAnteriorX = criatura.PosicionX;
+        int posAnteriorY = criatura.PosicionY;
+
         int movX = _random.Next(-1, 2);
         int movY = _random.Next(-1, 2);
         
-        int nuevoX = Math.Clamp(criatura.PosicionX + movX, 0, partida.Mapa.Ancho - 1);
-        int nuevoY = Math.Clamp(criatura.PosicionY + movY, 0, partida.Mapa.Alto - 1);
+        int nuevoX = Math.Clamp(criatura.PosicionX + movX, 1, partida.Mapa.Ancho);
+        int nuevoY = Math.Clamp(criatura.PosicionY + movY, 1, partida.Mapa.Alto);
+
+        int mapaX = nuevoX - 1;
+        int mapaY = nuevoY - 1;
+        var terrenoDestino = partida.Mapa.Celdas[mapaY][mapaX];
+        if (terrenoDestino == TipoTerreno.Roca)
+        {
+            return (new EventoSimulacion
+            {
+                Tipo = TipoEvento.CriaturaMovio,
+                Descripcion = $"🚫 {criatura.Nombre} no puede atravesar roca en ({nuevoX},{nuevoY})",
+                EntidadId = criatura.Id.ToString()
+            }, false);
+        }
 
         criatura.PosicionX = nuevoX;
         criatura.PosicionY = nuevoY;
@@ -224,20 +284,33 @@ public class SimulationService : ISimulationService
         {
             var objetivo = criaturasCercanas.First();
             ProcesarCombate(partida, criatura.Id, objetivo.Id);
-            return new EventoSimulacion
+            
+            string icono = objetivo.Vida <= 0 ? "💀" : "⚔️";
+            
+            return (new EventoSimulacion
             {
                 Tipo = TipoEvento.CriaturaAtaco,
-                Descripcion = $"{criatura.Nombre} ataco a {objetivo.Nombre}",
+                Descripcion = $"{icono} {criatura.Nombre} ataca a {objetivo.Nombre}. Dano: -{criatura.Ataque}",
                 EntidadId = criatura.Id.ToString()
-            };
+            }, true);
         }
 
-        return new EventoSimulacion
+        if (posAnteriorX != nuevoX || posAnteriorY != nuevoY)
+        {
+            return (new EventoSimulacion
+            {
+                Tipo = TipoEvento.CriaturaMovio,
+                Descripcion = $"➡️ {criatura.Nombre}: ({posAnteriorX},{posAnteriorY}) → ({nuevoX},{nuevoY}) | Vida: {criatura.Vida}",
+                EntidadId = criatura.Id.ToString()
+            }, false);
+        }
+
+        return (new EventoSimulacion
         {
             Tipo = TipoEvento.CriaturaMovio,
-            Descripcion = $"{criatura.Nombre} se movio a ({nuevoX},{nuevoY})",
+            Descripcion = $"⏸️ {criatura.Nombre} espera en ({nuevoX},{nuevoY})",
             EntidadId = criatura.Id.ToString()
-        };
+        }, false);
     }
 
     public void MoverCriatura(Partida partida, Guid criaturaId, int nuevoX, int nuevoY)
@@ -245,9 +318,16 @@ public class SimulationService : ISimulationService
         var criatura = partida.Criaturas.FirstOrDefault(c => c.Id == criaturaId);
         if (criatura == null) return;
 
-        if (nuevoX >= 0 && nuevoX < partida.Mapa.Ancho && 
-            nuevoY >= 0 && nuevoY < partida.Mapa.Alto)
+        if (nuevoX >= 1 && nuevoX <= partida.Mapa.Ancho && 
+            nuevoY >= 1 && nuevoY <= partida.Mapa.Alto)
         {
+            int mapaX = nuevoX - 1;
+            int mapaY = nuevoY - 1;
+            var terrenoDestino = partida.Mapa.Celdas[mapaY][mapaX];
+            if (terrenoDestino == TipoTerreno.Roca)
+            {
+                return;
+            }
             criatura.PosicionX = nuevoX;
             criatura.PosicionY = nuevoY;
         }
@@ -277,7 +357,9 @@ public class SimulationService : ISimulationService
         
         switch (recurso.Tipo)
         {
-            case TipoRecurso.Especia:
+            case TipoRecurso.Melange:
+            case TipoRecurso.EspeciaRosa:
+            case TipoRecurso.EspeciaNegra:
                 partida.InventarioGlobal.Especia += recurso.Cantidad;
                 break;
             case TipoRecurso.Agua:

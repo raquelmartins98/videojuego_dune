@@ -8,6 +8,7 @@ C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debu
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debug\net10.0\Dune.Persistence.Service.AssemblyInfoInputs.cache
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debug\net10.0\Dune.Persistence.Service.AssemblyInfo.cs
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debug\net10.0\Dune.Persistence.Service.csproj.CoreCompileInputs.cache
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debug\net10.0\Dune.Persistence.Service.sourcelink.json
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debug\net10.0\Dune.Per.857C2E34.Up2Date
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debug\net10.0\Dune.Persistence.Service.dll
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Persistence.Service\obj\Debug\net10.0\refint\Dune.Persistence.Service.dll

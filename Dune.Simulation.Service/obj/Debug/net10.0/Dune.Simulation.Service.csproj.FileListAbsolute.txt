@@ -8,6 +8,7 @@ C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug\net10.0\Dune.Simulation.Service.AssemblyInfoInputs.cache
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug\net10.0\Dune.Simulation.Service.AssemblyInfo.cs
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug\net10.0\Dune.Simulation.Service.csproj.CoreCompileInputs.cache
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug\net10.0\Dune.Simulation.Service.sourcelink.json
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug\net10.0\Dune.Sim.13795469.Up2Date
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug\net10.0\Dune.Simulation.Service.dll
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Simulation.Service\obj\Debug\net10.0\refint\Dune.Simulation.Service.dll

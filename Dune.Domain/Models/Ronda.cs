@@ -22,5 +22,6 @@ public enum TipoEvento
     RecursoExtraido,
     EnclaveAtacado,
     InstalacionConstruida,
-    RondaCompletada
+    RondaCompletada,
+    Ganancias
 }

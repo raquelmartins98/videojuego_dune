@@ -2,7 +2,9 @@ namespace Dune.Domain.Models;
 
 public enum TipoRecurso
 {
-    Especia,
+    Melange,
+    EspeciaRosa,
+    EspeciaNegra,
     Agua,
     Materiales,
     Energia

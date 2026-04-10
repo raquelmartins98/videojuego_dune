@@ -42,21 +42,27 @@ public class Enclave
         if (Tipo != TipoEnclave.Exhibicion) return 0;
         
         int hectareasInst = HectareasInstalaciones(todasInstalaciones);
-        if (Hectareas == 0) return 0;
+        if (hectareasInst == 0) hectareasInst = 1;
         
-        double factor = ((double)VisitantesMesEnclave * hectareasInst / Hectareas) * (saludMediaCriaturas / 100.0);
-        return (int)Math.Round(factor);
+        int baseVisitantes = VisitantesMesEnclave / 20;
+        int visitantesPorHectarea = (int)((double)VisitantesMesEnclave * hectareasInst / Hectareas * saludMediaCriaturas / 100.0);
+        
+        return Math.Max(baseVisitantes, visitantesPorHectarea);
     }
     
     public int VisitantesAbandonan(List<Instalacion> todasInstalaciones, double saludMediaCriaturas)
     {
         if (Tipo != TipoEnclave.Exhibicion) return 0;
         
-        int hectareasInst = HectareasInstalaciones(todasInstalaciones);
-        if (Hectareas == 0) return 0;
+        if (VisitantesActuales == 0) return 0;
         
-        double factor = ((double)VisitantesActuales * hectareasInst / Hectareas) * (saludMediaCriaturas / 100.0);
-        return (int)Math.Round(factor);
+        int hectareasInst = HectareasInstalaciones(todasInstalaciones);
+        if (hectareasInst == 0) hectareasInst = 1;
+        
+        int baseAbandonos = Math.Max(1, VisitantesActuales / 20);
+        int abandonosPorHectarea = (int)((double)VisitantesActuales * hectareasInst / Hectareas * (100 - saludMediaCriaturas) / 100.0);
+        
+        return Math.Min(VisitantesActuales, baseAbandonos + abandonosPorHectarea);
     }
     
     public void ActualizarVisitantes(List<Instalacion> todasInstalaciones, double saludMediaCriaturas)
@@ -66,6 +72,7 @@ public class Enclave
         int llegan = VisitantesLlegan(todasInstalaciones, saludMediaCriaturas);
         int abandonan = VisitantesAbandonan(todasInstalaciones, saludMediaCriaturas);
         
-        VisitantesActuales = Math.Max(0, VisitantesActuales + llegan - abandonan);
+        int nuevoVisitantes = VisitantesActuales + llegan - abandonan;
+        VisitantesActuales = Math.Max(VisitantesMesEnclave / 2, nuevoVisitantes);
     }
 }
