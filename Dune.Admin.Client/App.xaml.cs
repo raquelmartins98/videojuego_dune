@@ -21,8 +21,6 @@ public partial class App : Application
             var ex = args.ExceptionObject as Exception;
             var msg = $"[{DateTime.Now}] Error Fatal:\n{ex?.Message}\n\n{ex?.StackTrace}";
             File.AppendAllText(LogFile, msg + "\n\n");
-            MessageBox.Show($"Error no controlado:\n{ex?.Message}", 
-                "Error Fatal", MessageBoxButton.OK, MessageBoxImage.Error);
             Environment.Exit(1);
         };
 
@@ -30,8 +28,6 @@ public partial class App : Application
         {
             var msg = $"[{DateTime.Now}] Error UI:\n{args.Exception.Message}\n\n{args.Exception.StackTrace}";
             File.AppendAllText(LogFile, msg + "\n\n");
-            MessageBox.Show($"Error de UI:\n{args.Exception.Message}", 
-                "Error de Aplicacion", MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
 

@@ -17,6 +17,9 @@
         <conv:TipoEventoToColorConverter x:Key="TipoEventoToColor"/>
         <conv:TipoRecursoToDisplayNameConverter x:Key="TipoRecursoToDisplayName"/>
         <conv:TipoTerrenoToColorConverter x:Key="TipoTerrenoToColor"/>
+        <conv:TipoCriaturaToImageConverter x:Key="TipoCriaturaToImage"/>
+        <conv:TipoEnclaveToImageConverter x:Key="TipoEnclaveToImage"/>
+        <conv:TipoRecursoToImageConverter x:Key="TipoRecursoToImage"/>
         
         <!-- DUNE COLOR PALETTE -->
         <Style x:Key="DuneButton" TargetType="Button">
@@ -155,10 +158,8 @@
                 <StackPanel>
                     <Button Content="▸ NUEVA PARTIDA" Style="{StaticResource DuneButton}" Click="NuevaPartida_Click"/>
                     <Button Content="▸ CARGAR PARTIDA" Style="{StaticResource DuneButton}" Click="IrACargar_Click"/>
-                    <Button Content="▸ MANUAL" Style="{StaticResource DuneButton}" Click="IrAManual_Click"/>
                     <Button Content="▸ OPCIONES" Style="{StaticResource DuneButton}" Click="IrAOpciones_Click"/>
                     <Button Content="▸ CREDITOS" Style="{StaticResource DuneButton}" Click="IrACreditos_Click"/>
-                    <Button Content="▸ [TEST GAME OVER]" Style="{StaticResource DuneButton}" Click="TestGameOver_Click" Foreground="#FF4500"/>
                     <Button Content="▸ SALIR" Style="{StaticResource DuneButton}" Foreground="#FF4500" BorderBrush="#FF4500" Click="Salir_Click"/>
                 </StackPanel>
 
@@ -252,20 +253,23 @@
                         <ListBox Grid.Row="1" Style="{StaticResource DuneListBox}" ItemsSource="{Binding Criaturas}" ItemContainerStyle="{StaticResource DuneListBoxItem}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Margin="3">
-                                        <TextBlock Text="{Binding Nombre}" FontWeight="Bold" FontSize="12" Foreground="#C9A227"/>
-                                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                                            <TextBlock Text="VIDA: " Style="{StaticResource DuneLabel}"/>
-                                            <TextBlock Text="{Binding Vida}" Foreground="#228B22"/>
-                                            <TextBlock Text="/" Foreground="#4A3728"/>
-                                            <TextBlock Text="{Binding VidaMaxima}" Foreground="#4A3728"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="POSICION: (" Style="{StaticResource DuneLabel}"/>
-                                            <TextBlock Text="{Binding PosicionX}" Foreground="#D4AF37"/>
-                                            <TextBlock Text="," Style="{StaticResource DuneLabel}"/>
-                                            <TextBlock Text="{Binding PosicionY}" Foreground="#D4AF37"/>
-                                            <TextBlock Text=")" Style="{StaticResource DuneLabel}"/>
+                                    <StackPanel Margin="3" Orientation="Horizontal">
+                                        <Image Source="{Binding Tipo, Converter={StaticResource TipoCriaturaToImage}}" Width="48" Height="48" Margin="0,0,10,0"/>
+                                        <StackPanel Margin="0">
+                                            <TextBlock Text="{Binding Nombre}" FontWeight="Bold" FontSize="12" Foreground="#C9A227"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                <TextBlock Text="VIDA: " Style="{StaticResource DuneLabel}"/>
+                                                <TextBlock Text="{Binding Vida}" Foreground="#228B22"/>
+                                                <TextBlock Text="/" Foreground="#4A3728"/>
+                                                <TextBlock Text="{Binding VidaMaxima}" Foreground="#4A3728"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="POS: (" Style="{StaticResource DuneLabel}"/>
+                                                <TextBlock Text="{Binding PosicionX}" Foreground="#D4AF37"/>
+                                                <TextBlock Text="," Style="{StaticResource DuneLabel}"/>
+                                                <TextBlock Text="{Binding PosicionY}" Foreground="#D4AF37"/>
+                                                <TextBlock Text=")" Style="{StaticResource DuneLabel}"/>
+                                            </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -339,30 +343,37 @@
                             </Border>
                         </Expander>
                         
-                        <StackPanel Grid.Row="1">
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <StackPanel Margin="0,0,0,10">
                                 <TextBlock Text="◆ ENCLAVES ◆" Style="{StaticResource DuneTitle}"/>
                                 <TextBlock Text="Shai-Hulud - Ciudades del Desierto" Style="{StaticResource DuneLabel}"/>
                             </StackPanel>
                             
-                            <ListBox Style="{StaticResource DuneListBox}" ItemsSource="{Binding Enclaves}" ItemContainerStyle="{StaticResource DuneListBoxItem}">
+                            <ListBox Grid.Row="1" Style="{StaticResource DuneListBox}" ItemsSource="{Binding Enclaves}" ItemContainerStyle="{StaticResource DuneListBoxItem}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Margin="3">
-                                            <TextBlock Text="{Binding Nombre}" FontWeight="Bold" FontSize="12" Foreground="#C9A227"/>
-                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                                                <TextBlock Text="VISITANTES: " Style="{StaticResource DuneLabel}"/>
-                                                <TextBlock Text="{Binding VisitantesActuales}" Foreground="#D4AF37"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="NIVEL: " Style="{StaticResource DuneLabel}"/>
-                                                <TextBlock Text="{Binding Nivel}" Foreground="#00CED1"/>
+                                        <StackPanel Margin="3" Orientation="Horizontal">
+                                            <Image Source="{Binding Converter={StaticResource TipoEnclaveToImage}}" Width="48" Height="48" Margin="0,0,10,0"/>
+                                            <StackPanel Margin="0">
+                                                <TextBlock Text="{Binding Nombre}" FontWeight="Bold" FontSize="12" Foreground="#C9A227"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                    <TextBlock Text="VISITANTES: " Style="{StaticResource DuneLabel}"/>
+                                                    <TextBlock Text="{Binding VisitantesActuales}" Foreground="#D4AF37"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="NIVEL: " Style="{StaticResource DuneLabel}"/>
+                                                    <TextBlock Text="{Binding nivel}" Foreground="#00CED1"/>
+                                                </StackPanel>
                                             </StackPanel>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                        </StackPanel>
+                        </Grid>
                     </Grid>
                 </Border>
                 
@@ -382,26 +393,23 @@
                         <ListBox Grid.Row="1" Style="{StaticResource DuneListBox}" ItemsSource="{Binding RecursosPaginados}" ItemContainerStyle="{StaticResource DuneListBoxItem}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Margin="3">
-                                        <TextBlock Text="{Binding Tipo, Converter={StaticResource TipoRecursoToDisplayName}}" FontWeight="Bold" FontSize="13" Foreground="#C9A227"/>
-                                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                                            <TextBlock Text="TOTAL: " Style="{StaticResource DuneLabel}"/>
-                                            <TextBlock Text="{Binding CantidadTotal}" FontWeight="Bold" FontSize="14" Foreground="#D4AF37"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="YACIMIENTOS: " Style="{StaticResource DuneLabel}"/>
-                                            <TextBlock Text="{Binding CantidadYacimientos}" Foreground="#D4AF37"/>
+                                    <StackPanel Margin="3" Orientation="Horizontal">
+                                        <Image Source="{Binding Tipo, Converter={StaticResource TipoRecursoToImage}}" Width="48" Height="48" Margin="0,0,10,0"/>
+                                        <StackPanel Margin="0">
+                                            <TextBlock Text="{Binding Tipo, Converter={StaticResource TipoRecursoToDisplayName}}" FontWeight="Bold" FontSize="13" Foreground="#C9A227"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                <TextBlock Text="TOTAL: " Style="{StaticResource DuneLabel}"/>
+                                                <TextBlock Text="{Binding CantidadTotal}" FontWeight="Bold" FontSize="14" Foreground="#D4AF37"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="YACIMIENTOS: " Style="{StaticResource DuneLabel}"/>
+                                                <TextBlock Text="{Binding CantidadYacimientos}" Foreground="#D4AF37"/>
+                                            </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        
-                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                            <Button Content="◀" Style="{StaticResource DuneButton}" Padding="10,5" Click="PaginaAnteriorRecursos_Click"/>
-                            <TextBlock Text="{Binding PaginaRecursosTexto}" VerticalAlignment="Center" Foreground="#C9A227" FontFamily="Consolas" Margin="10,0"/>
-                            <Button Content="▶" Style="{StaticResource DuneButton}" Padding="10,5" Click="PaginaSiguienteRecursos_Click"/>
-                        </StackPanel>
                     </Grid>
                 </Border>
                 
@@ -481,29 +489,50 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                    <Button x:Name="Slot1Cargar" Style="{StaticResource DuneButton}" Padding="30,20" Margin="10" Click="Slot1Cargar_Click">
-                        <StackPanel>
-                            <TextBlock x:Name="Slot1CargarNombre" Text="SLOT 1 - VACIO" FontSize="18" FontWeight="Bold"/>
-                            <TextBlock x:Name="Slot1CargarInfo" Text="Sin datos" Foreground="#8B7355" Margin="0,5,0,0"/>
-                            <TextBlock x:Name="Slot1CargarFecha" Text="" Foreground="#8B7355" Margin="0,5,0,0"/>
-                        </StackPanel>
-                    </Button>
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="Slot1Cargar" Style="{StaticResource DuneButton}" Padding="30,20" Click="Slot1Cargar_Click">
+                            <StackPanel>
+                                <TextBlock x:Name="Slot1CargarNombre" Text="SLOT 1 - VACIO" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock x:Name="Slot1CargarInfo" Text="Sin datos" Foreground="#8B7355" Margin="0,5,0,0"/>
+                                <TextBlock x:Name="Slot1CargarFecha" Text="" Foreground="#8B7355" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="1" Content="✕" Style="{StaticResource DuneButton}" Padding="15,20" Click="Slot1Eliminar_Click" ToolTip="Eliminar partida"/>
+                    </Grid>
 
-                    <Button x:Name="Slot2Cargar" Style="{StaticResource DuneButton}" Padding="30,20" Margin="10" Click="Slot2Cargar_Click">
-                        <StackPanel>
-                            <TextBlock x:Name="Slot2CargarNombre" Text="SLOT 2 - VACIO" FontSize="18" FontWeight="Bold"/>
-                            <TextBlock x:Name="Slot2CargarInfo" Text="Sin datos" Foreground="#8B7355" Margin="0,5,0,0"/>
-                            <TextBlock x:Name="Slot2CargarFecha" Text="" Foreground="#8B7355" Margin="0,5,0,0"/>
-                        </StackPanel>
-                    </Button>
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="Slot2Cargar" Style="{StaticResource DuneButton}" Padding="30,20" Click="Slot2Cargar_Click">
+                            <StackPanel>
+                                <TextBlock x:Name="Slot2CargarNombre" Text="SLOT 2 - VACIO" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock x:Name="Slot2CargarInfo" Text="Sin datos" Foreground="#8B7355" Margin="0,5,0,0"/>
+                                <TextBlock x:Name="Slot2CargarFecha" Text="" Foreground="#8B7355" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="1" Content="✕" Style="{StaticResource DuneButton}" Padding="15,20" Click="Slot2Eliminar_Click" ToolTip="Eliminar partida"/>
+                    </Grid>
 
-                    <Button x:Name="Slot3Cargar" Style="{StaticResource DuneButton}" Padding="30,20" Margin="10" Click="Slot3Cargar_Click">
-                        <StackPanel>
-                            <TextBlock x:Name="Slot3CargarNombre" Text="SLOT 3 - VACIO" FontSize="18" FontWeight="Bold"/>
-                            <TextBlock x:Name="Slot3CargarInfo" Text="Sin datos" Foreground="#8B7355" Margin="0,5,0,0"/>
-                            <TextBlock x:Name="Slot3CargarFecha" Text="" Foreground="#8B7355" Margin="0,5,0,0"/>
-                        </StackPanel>
-                    </Button>
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="Slot3Cargar" Style="{StaticResource DuneButton}" Padding="30,20" Click="Slot3Cargar_Click">
+                            <StackPanel>
+                                <TextBlock x:Name="Slot3CargarNombre" Text="SLOT 3 - VACIO" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock x:Name="Slot3CargarInfo" Text="Sin datos" Foreground="#8B7355" Margin="0,5,0,0"/>
+                                <TextBlock x:Name="Slot3CargarFecha" Text="" Foreground="#8B7355" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="1" Content="✕" Style="{StaticResource DuneButton}" Padding="15,20" Click="Slot3Eliminar_Click" ToolTip="Eliminar partida"/>
+                    </Grid>
                 </StackPanel>
 
                 <Button Grid.Row="2" Content="◀ VOLVER AL MENU" Style="{StaticResource DuneButton}" HorizontalAlignment="Center" Padding="30,15" Click="VolverMenu_Click"/>
@@ -652,6 +681,12 @@
 
                 <Border Grid.Row="1" Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="40" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <StackPanel>
+                        <TextBlock Text="CREADORES" Foreground="#8B7355" FontFamily="Consolas" TextAlignment="Center"/>
+                        <TextBlock Text="Selene Inmaculada Garcia Chacon" Foreground="#C9A227" FontFamily="Consolas" TextAlignment="Center" Margin="0,8,0,4"/>
+                        <TextBlock Text="Jose Maria Pinilla Melgar" Foreground="#C9A227" FontFamily="Consolas" TextAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBlock Text="Raquel Martin Sarmiento" Foreground="#C9A227" FontFamily="Consolas" TextAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBlock Text="Ana Vanesa Fernandez Ortigosa" Foreground="#C9A227" FontFamily="Consolas" TextAlignment="Center" Margin="0,0,0,20"/>
+                        
                         <TextBlock Text="DESARROLLADO CON" Foreground="#8B7355" FontFamily="Consolas" TextAlignment="Center"/>
                         <TextBlock Text=".NET 10 + WPF" Foreground="#C9A227" FontFamily="Consolas" FontSize="20" TextAlignment="Center" Margin="0,10,0,20"/>
                         
@@ -672,141 +707,6 @@
             </Grid>
         </Grid>
 
-        <!-- PAGINA MANUAL -->
-        <Grid x:Name="PaginaManual" Visibility="Collapsed" Background="#0D0D0D">
-            <Grid Margin="30">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Text="◈ MANUAL DE JUEGO ◈" Foreground="#C9A227" FontFamily="Consolas" FontSize="28" FontWeight="Bold" TextAlignment="Center" Margin="0,0,0,20"/>
-
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-
-                        <!-- COMO JUGAR -->
-                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
-                            <StackPanel>
-                                <TextBlock Text="◆ COMO JUGAR ◆" Foreground="#C9A227" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                                
-                                <TextBlock Text="OBJETIVO DEL JUEGO" Foreground="#FF4500" FontFamily="Consolas" FontWeight="Bold" Margin="0,0,0,5"/>
-                                <TextBlock Text="Gestiona las criaturas de Arrakis, recolecta especias valiosas y mantiene un ecosistema balanceado. Sobrevive las rondas y acumula la mayor cantidad de recursos." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,15"/>
-                                
-                                <TextBlock Text="COMO AVANZAR" Foreground="#FF4500" FontFamily="Consolas" FontWeight="Bold" Margin="0,0,0,5"/>
-                                <TextBlock Text="1. Selecciona una criatura haciendo clic en ella" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                                <TextBlock Text="2. Selecciona una zona en el mapa (celda de color)" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                                <TextBlock Text="3. Selecciona un recurso disponible en esa zona" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                                <TextBlock Text="4. Haz clic en 'ACTUALIZAR' para ejecutar la accion" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,15"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- CRIATURAS -->
-                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
-                            <StackPanel>
-                                <TextBlock Text="◆ CRIATURAS ◆" Foreground="#FF4500" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                                
-                                <TextBlock Text="Cada criatura tiene un rol especifico y afecta el juego de manera diferente:" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="GUSANO DE ARENA JUVENIL" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Rol: DEPREDADOR | Vida: 100 | Ataque: 25" Foreground="#228B22" FontFamily="Consolas"/>
-                                <TextBlock Text="El rey del desierto. Muy fuerte pero requiere mucha energia." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="TIGRE LAZA" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Rol: DEPREDADOR | Vida: 80 | Ataque: 30" Foreground="#228B22" FontFamily="Consolas"/>
-                                <TextBlock Text="El cazador mas agresivo. Alto dano, vida moderada." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="MUAD'DIB" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Rol: RECOLECTOR | Vida: 50 | Ataque: 15" Foreground="#00CED1" FontFamily="Consolas"/>
-                                <TextBlock Text="Especialista en recolectar recursos. Mas vulnerable pero eficiente." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="HALCON DEL DESIERTO" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Rol: DEPREDADOR | Vida: 40 | Ataque: 20" Foreground="#228B22" FontFamily="Consolas"/>
-                                <TextBlock Text="Rapido y letal. Poco durable pero efectivo." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="TRUCHA DE ARENA" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Rol: DEPREDADOR | Vida: 60 | Ataque: 10" Foreground="#228B22" FontFamily="Consolas"/>
-                                <TextBlock Text="Emergente del subsuelo. Ataque bajo pero duro de pelar." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- RECURSOS -->
-                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
-                            <StackPanel>
-                                <TextBlock Text="◆ RECURSOS ◆" Foreground="#C9A227" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                                
-                                <TextBlock Text="⬛ ESPECIA NEGRA (Legendaria)" Foreground="#9370DB" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="La mas pura y poderosa. Regenera +5 por Ronda. Muy rara." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="🌸 ESPECIA ROSA (Rara)" Foreground="#FF69B4" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Variante exotica con propiedades unicas. Regenera +8 por Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="🟠 MELANGE (Comun)" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="El recurso mas valioso del universo. Regenera +10 por Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="💧 AGUA" Foreground="#00CED1" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Vital para la supervivencia. Escasa en Arrakis." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="MATERIALES" Foreground="#8B7355" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Para construir instalaciones." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="ENERGIA" Foreground="#D4AF37" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Necesaria para el funcionamiento de instalaciones." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- INSTALACIONES -->
-                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
-                            <StackPanel>
-                                <TextBlock Text="◆ INSTALACIONES ◆" Foreground="#00CED1" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                                
-                                <TextBlock Text="ACLIMATACION" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="20% probabilidad de generar una nueva criatura por Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="EXHIBICION" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Alberga criaturas para exhibicion. Atrae visitantes a los enclaves." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="RECOLECCION" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Genera clones de Muad'Dib para recolectar recursos automaticamente." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- ENCLAVES -->
-                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
-                            <StackPanel>
-                                <TextBlock Text="◆ ENCLAVES ◆" Foreground="#228B22" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                                
-                                <TextBlock Text="ENCLAVES DE EXHIBICION" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Reciben visitantes que admiran las criaturas. Generan donacion de Especia segun la popularidad de tus criaturas." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                <TextBlock Text="Nivel Bajo: 1x | Nivel Medio: 15x | Nivel Alto: 30x" Foreground="#D4AF37" FontFamily="Consolas"/>
-                                <TextBlock Text="Multiplicador de donacion basado en la salud y edad de las criaturas." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                                
-                                <TextBlock Text="ENCLAVES DE CAZA" Foreground="#C9A227" FontFamily="Consolas" FontWeight="Bold"/>
-                                <TextBlock Text="Permiten cazar criaturas y obtener recursos adicionales." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- TIPS -->
-                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20">
-                            <StackPanel>
-                                <TextBlock Text="◆ CONSEJOS ESTRATEGICOS ◆" Foreground="#FFD700" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                                
-                                <TextBlock Text="• Manten tus criaturas bien alimentadas y saludables para atraer mas visitantes." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                <TextBlock Text="• Construye instalaciones de Exhibicion cerca de criaturas populares." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                <TextBlock Text="• Usa criaturas recolectoras para Passive Income de especias." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                <TextBlock Text="• Las instalaciones de Aclimatacion generan nuevas criaturas gratis." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                <TextBlock Text="• Equilibra depredadores y recolectores segun tu estilo de juego." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                <TextBlock Text="• Guarda frecuentemente para no perder progreso." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-
-                <Button Grid.Row="2" Content="◀ VOLVER" Style="{StaticResource DuneButton}" HorizontalAlignment="Center" Padding="30,15" Click="VolverMenu_Click"/>
-            </Grid>
-        </Grid>
-        
         <!-- PAGINA BESTIARIO -->
         <Grid x:Name="PaginaBestiario" Visibility="Collapsed" Background="#0D0D0D">
             <Grid Margin="30">
@@ -820,63 +720,100 @@
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
+                        <!-- COMO JUGAR -->
+                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
+                            <StackPanel>
+                                <TextBlock Text="◆ COMO JUGAR ◆" Foreground="#C9A227" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                                
+                                <TextBlock Text="OBJETIVO DEL JUEGO" Foreground="#FF4500" FontFamily="Consolas" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBlock Text="Gestiona las criaturas de Arrakis, recolecta especias valiosas y mantiene un ecosistema balanceado. Sobrevive las rondas y acumula la mayor cantidad de recursos." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                                
+                                <TextBlock Text="COMO AVANZAR" Foreground="#FF4500" FontFamily="Consolas" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBlock Text="1. Selecciona una criatura haciendo clic en ella" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                <TextBlock Text="2. Selecciona una zona en el mapa (celda de color)" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                <TextBlock Text="3. Selecciona un recurso disponible en esa zona" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                <TextBlock Text="4. Haz clic en 'ACTUALIZAR' para ejecutar la accion" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                                
+                                <TextBlock Text="TIPOS DE ACCIONES" Foreground="#FF4500" FontFamily="Consolas" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBlock Text="MOVER: Desplaza una criatura a otra zona" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                <TextBlock Text="ATACAR: Una criatura ataca a otra" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                <TextBlock Text="EXTRAER: Obtener recursos de una zona" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                <TextBlock Text="CONSTRUIR: Crear nuevas instalaciones" Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
                         <!-- CRIATURAS -->
                         <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
                             <StackPanel>
                                 <TextBlock Text="◆ CRIATURAS DE ARRakis ◆" Foreground="#FF4500" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
                                 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="Gusano de Arena Juvenil" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Los Gusanos de Arena son criaturas imponentes que habitan en las profundidades del desierto de Arrakis. Son esenciales para la produccion de Especia." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Rol: " Foreground="#4A3728"/>
-                                        <TextBlock Text="Depredador | " Foreground="#FF4500"/>
-                                        <TextBlock Text="Vida: 100 | " Foreground="#228B22"/>
-                                        <TextBlock Text="Ataque: 25" Foreground="#FF4500"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoCriaturaToImageConverter.InstanceGusano}" Width="64" Height="64" Margin="0,0,15,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Gusano de Arena Juvenil" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Los Gusanos de Arena son criaturas imponentes que habitan en las profundidades del desierto de Arrakis. Son esenciales para la produccion de Especia." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5" MaxWidth="400"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Rol: " Foreground="#4A3728"/>
+                                            <TextBlock Text="Depredador | " Foreground="#FF4500"/>
+                                            <TextBlock Text="Vida: 100 | " Foreground="#228B22"/>
+                                            <TextBlock Text="Ataque: 25" Foreground="#FF4500"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="Tigre Laza" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Depredador feroz adaptado al clima extremo del desierto. Excelente cazador." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Rol: " Foreground="#4A3728"/>
-                                        <TextBlock Text="Depredador | " Foreground="#FF4500"/>
-                                        <TextBlock Text="Vida: 80 | " Foreground="#228B22"/>
-                                        <TextBlock Text="Ataque: 30" Foreground="#FF4500"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoCriaturaToImageConverter.InstanceTigre}" Width="64" Height="64" Margin="0,0,15,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Tigre Laza" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Depredador feroz adaptado al clima extremo del desierto. Excelente cazador." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5" MaxWidth="400"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Rol: " Foreground="#4A3728"/>
+                                            <TextBlock Text="Depredador | " Foreground="#FF4500"/>
+                                            <TextBlock Text="Vida: 80 | " Foreground="#228B22"/>
+                                            <TextBlock Text="Ataque: 30" Foreground="#FF4500"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="Muad'Dib" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Criatura simbolo de Arrakis. Excelente recolector de recursos." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Rol: " Foreground="#4A3728"/>
-                                        <TextBlock Text="Recolector | " Foreground="#00CED1"/>
-                                        <TextBlock Text="Vida: 50 | " Foreground="#228B22"/>
-                                        <TextBlock Text="Ataque: 15" Foreground="#FF4500"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoCriaturaToImageConverter.InstanceRoedoer}" Width="64" Height="64" Margin="0,0,15,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Muad'Dib" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Criatura simbolo de Arrakis. Excelente recolector de recursos." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5" MaxWidth="400"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Rol: " Foreground="#4A3728"/>
+                                            <TextBlock Text="Recolector | " Foreground="#00CED1"/>
+                                            <TextBlock Text="Vida: 50 | " Foreground="#228B22"/>
+                                            <TextBlock Text="Ataque: 15" Foreground="#FF4500"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="Halcon del Desierto" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Ave rapaz que sobrevuela el desierto en busca de presas." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Rol: " Foreground="#4A3728"/>
-                                        <TextBlock Text="Depredador | " Foreground="#FF4500"/>
-                                        <TextBlock Text="Vida: 40 | " Foreground="#228B22"/>
-                                        <TextBlock Text="Ataque: 20" Foreground="#FF4500"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoCriaturaToImageConverter.InstanceHalcon}" Width="64" Height="64" Margin="0,0,15,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Halcon del Desierto" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Ave rapaz que sobrevuela el desierto en busca de presas." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5" MaxWidth="400"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Rol: " Foreground="#4A3728"/>
+                                            <TextBlock Text="Depredador | " Foreground="#FF4500"/>
+                                            <TextBlock Text="Vida: 40 | " Foreground="#228B22"/>
+                                            <TextBlock Text="Ataque: 20" Foreground="#FF4500"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel>
-                                    <TextBlock Text="Trucha de Arena" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Criatura subterranea que emerge de la arena. Muy agresiva." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Rol: " Foreground="#4A3728"/>
-                                        <TextBlock Text="Depredador | " Foreground="#FF4500"/>
-                                        <TextBlock Text="Vida: 60 | " Foreground="#228B22"/>
-                                        <TextBlock Text="Ataque: 10" Foreground="#FF4500"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoCriaturaToImageConverter.InstanceAmeba}" Width="64" Height="64" Margin="0,0,15,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Trucha de Arena" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Criatura subterranea que emerge de la arena. Muy agresiva." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5" MaxWidth="400"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Rol: " Foreground="#4A3728"/>
+                                            <TextBlock Text="Depredador | " Foreground="#FF4500"/>
+                                            <TextBlock Text="Vida: 60 | " Foreground="#228B22"/>
+                                            <TextBlock Text="Ataque: 10" Foreground="#FF4500"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>
@@ -887,38 +824,58 @@
                             <StackPanel>
                                 <TextBlock Text="◆ RECURSOS DE ARRakis ◆" Foreground="#C9A227" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
                                 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="⬛ Especia Negra" Foreground="#1A1A1A" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="La forma mas pura y poderosa de Melange. Extremadamente rara, se encuentra en las profundidades del desierto. Regenera +5 cada Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <TextBlock Text="Rareza: Legendaria | Valor: Incalculable" Foreground="#9370DB"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoRecursoToImageConverter.InstanceNegro}" Width="48" Height="48" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Especia Negra" Foreground="#9370DB" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="La forma mas pura y poderosa de Melange. Extremadamente rara. Regenera +5 cada Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                        <TextBlock Text="Rareza: Legendaria | Valor: Incalculable" Foreground="#9370DB"/>
+                                    </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="🌸 Especia Rosa" Foreground="#FF69B4" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Una variante exotica del Melange con propiedades unicas. Regenera +8 cada Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <TextBlock Text="Rareza: Rara | Valor: Muy alto" Foreground="#FF69B4"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoRecursoToImageConverter.InstanceRosa}" Width="48" Height="48" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Especia Rosa" Foreground="#FF69B4" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Una variante exotica del Melange con propiedades unicas. Regenera +8 cada Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                        <TextBlock Text="Rareza: Rara | Valor: Muy alto" Foreground="#FF69B4"/>
+                                    </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="🟠 Melange" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="El recurso mas valioso del universo. Se encuentra en los yermos de Arrakis. Regenera +10 unidades cada Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <TextBlock Text="Rareza: Común | Valor: Alto" Foreground="#D4AF37"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoRecursoToImageConverter.InstanceMelange}" Width="48" Height="48" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Melange" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="El recurso mas valioso del universo. Regenera +10 unidades cada Ronda." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                        <TextBlock Text="Rareza: Comun | Valor: Alto" Foreground="#D4AF37"/>
+                                    </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="💧 Agua" Foreground="#00CED1" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Recurso vital para la supervivencia en el desierto. Escasez extrema en Arrakis." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <TextBlock Text="Icono: 💧 | Color: Cyan" Foreground="#00CED1"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoRecursoToImageConverter.InstanceAgua}" Width="48" Height="48" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Agua" Foreground="#00CED1" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Recurso vital para la supervivencia en el desierto." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                        <TextBlock Text="Escasez extrema en Arrakis" Foreground="#00CED1"/>
+                                    </StackPanel>
                                 </StackPanel>
-
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="Materiales" Foreground="#8B7355" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Recursos para la construccion de instalaciones." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
+                                
+                                <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                                    <Border Width="60"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Materiales" Foreground="#8B7355" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Necesario para la construccion de instalaciones." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                        <TextBlock Text="Recurso esencial para obras" Foreground="#8B7355"/>
+                                    </StackPanel>
                                 </StackPanel>
-
-                                <StackPanel>
-                                    <TextBlock Text="Energia" Foreground="#D4AF37" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Necesaria para el funcionamiento de las instalaciones." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
+                                
+                                <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                                    <Border Width="60"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Energia" Foreground="#FFD700" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Mantiene sistemas e instalaciones activas." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                        <TextBlock Text="Consumida por todas las estructuras" Foreground="#FFD700"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -928,28 +885,42 @@
                             <StackPanel>
                                 <TextBlock Text="◆ ENCLAVES ◆" Foreground="#228B22" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
                                 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="Enclaves de Exhibicion" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Reciben visitantes que admiran las criaturas. Generan donacion de Especia segun la popularidad de las criaturas." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Nivel Bajo: " Foreground="#4A3728"/>
-                                        <TextBlock Text="1x donacion | " Foreground="#228B22"/>
-                                        <TextBlock Text="Nivel Medio: " Foreground="#4A3728"/>
-                                        <TextBlock Text="15x | " Foreground="#D4AF37"/>
-                                        <TextBlock Text="Nivel Alto: " Foreground="#4A3728"/>
-                                        <TextBlock Text="30x" Foreground="#C9A227"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoEnclaveToImageConverter.InstanceArena1}" Width="64" Height="64" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Cuenca Experimental de Arrakis" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Centro de investigacion para el estudio de criaturas del desierto." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel>
-                                    <TextBlock Text="Enclaves de Caza" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
-                                    <TextBlock Text="Permiten cazar criaturas y obtener recursos adicionales." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoEnclaveToImageConverter.InstanceArena2}" Width="64" Height="64" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Arrakeen" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Capital de Arrakis. Centro comercial y politico del planeta." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,15" Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoEnclaveToImageConverter.InstanceArena3}" Width="64" Height="64" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Giedi Prime" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Proyecto de origen de la Casa Harkonnen. Industria y poder." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{x:Static conv:TipoEnclaveToImageConverter.InstanceRocas}" Width="64" Height="64" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Caladan" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
+                                        <TextBlock Text="Planeta ancestral de la Casa Atreides. Hogar tranquilo." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" MaxWidth="350"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
                         <!-- INSTALACIONES -->
-                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20">
+                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20" Margin="0,0,0,20">
                             <StackPanel>
                                 <TextBlock Text="◆ INSTALACIONES ◆" Foreground="#00CED1" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
                                 
@@ -967,6 +938,20 @@
                                     <TextBlock Text="Recoleccion" Foreground="#C9A227" FontFamily="Consolas" FontSize="14" FontWeight="Bold"/>
                                     <TextBlock Text="Genera automaticamente Muad'Dib clones para recolectar recursos." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,5,0,5"/>
                                 </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- CONSEJOS -->
+                        <Border Background="#1A1410" BorderBrush="#4A3728" BorderThickness="1" Padding="20">
+                            <StackPanel>
+                                <TextBlock Text="◆ CONSEJOS ESTRATEGICOS ◆" Foreground="#FFD700" FontFamily="Consolas" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                                
+                                <TextBlock Text="• Manten tus criaturas bien alimentadas y saludables para atraer mas visitantes." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                <TextBlock Text="• Construye instalaciones de Exhibicion cerca de criaturas populares." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                <TextBlock Text="• Usa criaturas recolectoras para Passive Income de especias." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                <TextBlock Text="• Las instalaciones de Aclimatacion generan nuevas criaturas gratis." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                <TextBlock Text="• Equilibra depredadores y recolectores segun tu estilo de juego." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                <TextBlock Text="• Guarda frecuentemente para no perder progreso." Foreground="#8B7355" FontFamily="Consolas" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

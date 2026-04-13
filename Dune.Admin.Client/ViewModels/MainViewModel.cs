@@ -32,6 +32,8 @@ public class MainViewModel : ViewModelBase
     private TipoEvento? _filtroActual;
     private int _paginaActual = 1;
     private const int EventosPorPagina = 8;
+    private bool _creandoPartida = false;
+    public bool CreandoPartida => _creandoPartida;
     
     public MainViewModel()
     {
@@ -168,6 +170,12 @@ public class MainViewModel : ViewModelBase
     public event Action? RondaCompletada;
     public event Action? PartidaActualizada;
     
+    public void LimpiarEventos()
+    {
+        RondaCompletada = null;
+        PartidaActualizada = null;
+    }
+    
     private bool HayEventosEnPaginaActual()
     {
         if (TotalEventosFiltrados == 0) return false;
@@ -269,14 +277,33 @@ public class MainViewModel : ViewModelBase
 
     private async void CrearNuevaPartida(object? parameter)
     {
+        var logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
+        var log = new System.Text.StringBuilder();
+        Action<string> EscribirLog = (msg) => {
+            log.AppendLine($"{DateTime.Now:HH:mm:ss.fff} - [COMMAND] {msg}");
+            System.Diagnostics.Debug.WriteLine($"[COMMAND] {msg}");
+        };
+        
         try
         {
-            LimpiarTodo();
+            EscribirLog("=== CREAR NUEVA PARTIDA (COMMAND) ===");
             
+            EscribirLog("Antes de CrearPartidaWindow");
             var dialog = new CrearPartidaWindow();
-            if (dialog.ShowDialog() == true)
+            EscribirLog("DESPUES de CrearPartidaWindow, antes de ShowDialog");
+            
+            var dialogResult = dialog.ShowDialog();
+            EscribirLog($"DESPUES de ShowDialog, result: {dialogResult}");
+            
+            if (dialogResult == true)
             {
-                System.Diagnostics.Debug.WriteLine("CrearNuevaPartida: Creando partida...");
+                EscribirLog("Limpiando datos anteriores...");
+                LimpiarTodo();
+                EscribirLog("DESPUES de LimpiarTodo");
+                
+                EscribirLog($"Nombre partida: {dialog.NombrePartida}");
+                EscribirLog("Creando partida...");
+                
                 var partida = new Partida
                 {
                     Nombre = dialog.NombrePartida,
@@ -284,20 +311,41 @@ public class MainViewModel : ViewModelBase
                 };
 
                 partida.Criaturas.AddRange(GenerarCriaturasIniciales());
+                EscribirLog("Criaturas agregadas");
+                
                 partida.Enclaves.AddRange(GenerarEnclavesIniciales());
-                partida.Recursos.AddRange(GenerarRecursosIniciales());
+                EscribirLog("Enclaves agregados");
+                
+                partida.Recursos.AddRange(GenerarRecursosIniciales(partida.Mapa));
+                EscribirLog("Recursos agregados");
+                
                 partida.Instalaciones.AddRange(GenerarInstalacionesIniciales(partida.Enclaves));
+                EscribirLog("Instalaciones agregadas");
 
                 PartidaActual = partida;
+                EscribirLog("PartidaActual asignada");
+                
                 ActualizarColecciones();
+                EscribirLog("Colecciones actualizadas");
+                
                 await AutoGuardarAsync();
+                EscribirLog("Auto-guardado completado");
 
                 MensajeEstado = $"Partida '{PartidaActual.Nombre}' creada - Ronda {PartidaActual.RondaActual}";
-                System.Diagnostics.Debug.WriteLine("CrearNuevaPartida: Partida creada correctamente");
+                EscribirLog("=== SUCCESS ===");
             }
+            else
+            {
+                EscribirLog("Dialog cancelado - sin cambios");
+            }
+            
+            System.IO.File.WriteAllText(logPath, log.ToString());
         }
         catch (Exception ex)
         {
+            log.AppendLine($"ERROR: {ex.Message}");
+            log.AppendLine(ex.StackTrace);
+            System.IO.File.WriteAllText(logPath, log.ToString());
             System.Diagnostics.Debug.WriteLine($"CrearNuevaPartida ERROR: {ex.Message}");
             System.Diagnostics.Debug.WriteLine(ex.StackTrace);
             MensajeEstado = $"Error al crear partida: {ex.Message}";
@@ -311,17 +359,42 @@ public class MainViewModel : ViewModelBase
 
     public void CrearPartidaConNombre(string nombre)
     {
+        var logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
+        var log = new System.Text.StringBuilder();
+        Action<string> EscribirLog = (msg) => {
+            log.AppendLine($"{DateTime.Now:HH:mm:ss.fff} - {msg}");
+            System.Diagnostics.Debug.WriteLine(msg);
+        };
+        
         try
         {
-            LimpiarTodo();
+            EscribirLog("=== INICIO CrearPartidaConNombre ===");
+            
+            RondaCompletada = null;
+            PartidaActualizada = null;
+            EscribirLog("Eventos limpiados");
+            
+            Eventos.Clear();
+            _todosLosEventos.Clear();
+            _filtroActual = null;
+            _paginaActual = 1;
+            
+            if (_partidaActual != null)
+            {
+                _partidaActual.HistorialRondas.Clear();
+            }
+            _partidaActual = null;
+            EscribirLog("Partida anterior null");
             
             var partida = new Partida
             {
                 Nombre = string.IsNullOrWhiteSpace(nombre) ? "Partida sin nombre" : nombre,
                 Mapa = GenerarMapaAleatorio(20, 20)
             };
+            EscribirLog("Mapa generado");
 
             PartidaActual = partida;
+            EscribirLog("PartidaActual asignada");
 
             foreach (var cri in GenerarCriaturasIniciales())
             {
@@ -330,6 +403,8 @@ public class MainViewModel : ViewModelBase
                 cri.PosicionY = pos.y;
                 partida.Criaturas.Add(cri);
             }
+            EscribirLog("Criaturas creadas");
+            
             foreach (var enc in GenerarEnclavesIniciales())
             {
                 var pos = AjustarPosicionSiEsRoca(partida.Mapa, enc.PosicionX, enc.PosicionY);
@@ -337,39 +412,82 @@ public class MainViewModel : ViewModelBase
                 enc.PosicionY = pos.y;
                 partida.Enclaves.Add(enc);
             }
-            partida.Recursos.AddRange(GenerarRecursosIniciales());
+            EscribirLog("Enclaves creados");
+            
+            partida.Recursos.AddRange(GenerarRecursosIniciales(partida.Mapa));
             partida.Instalaciones.AddRange(GenerarInstalacionesIniciales(partida.Enclaves));
+            EscribirLog("Recursos e instalaciones creados");
 
-            ActualizarColecciones();
+            Criaturas.Clear();
+            Enclaves.Clear();
+            Recursos.Clear();
+            Instalaciones.Clear();
+            EscribirLog("Colecciones limpiadas");
+
+            foreach (var c in PartidaActual.Criaturas)
+                Criaturas.Add(c);
+            foreach (var e in PartidaActual.Enclaves)
+                Enclaves.Add(e);
+            foreach (var r in PartidaActual.Recursos.Where(x => !x.Extraido))
+                Recursos.Add(r);
+            foreach (var i in PartidaActual.Instalaciones)
+                Instalaciones.Add(i);
+            EscribirLog("Colecciones populadas");
+            
+            ActualizarRecursosAgrupados();
             ActualizarPaginacion();
+            EscribirLog("Actualizaciones completadas");
 
             MensajeEstado = $"Partida '{PartidaActual.Nombre}' creada - Ronda {PartidaActual.RondaActual}";
-            System.Diagnostics.Debug.WriteLine($"CrearPartidaConNombre: Partida '{nombre}' creada correctamente");
+            EscribirLog("=== FIN CrearPartidaConNombre EXITOSO ===");
+            
+            System.IO.File.WriteAllText(logPath, log.ToString());
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"CrearPartidaConNombre ERROR: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+            log.AppendLine($"ERROR: {ex.Message}");
+            log.AppendLine(ex.StackTrace);
+            System.IO.File.WriteAllText(logPath, log.ToString());
+            System.Diagnostics.Debug.WriteLine($"ERROR CrearPartidaConNombre: {ex.Message}");
             MensajeEstado = $"Error al crear partida: {ex.Message}";
         }
     }
 
     private (int x, int y) AjustarPosicionSiEsRoca(Mapa mapa, int x, int y)
     {
-        if (mapa.Celdas[y - 1][x - 1] != TipoTerreno.Roca)
+        try
         {
-            return (x, y);
-        }
-        for (int ny = 1; ny <= mapa.Alto; ny++)
-        {
-            for (int nx = 1; nx <= mapa.Ancho; nx++)
+            if (mapa?.Celdas == null || mapa.Celdas.Count == 0)
+                return (x, y);
+            
+            int idxY = y - 1;
+            int idxX = x - 1;
+            
+            if (idxY < 0 || idxY >= mapa.Celdas.Count)
+                idxY = 0;
+            if (idxX < 0 || idxX >= mapa.Celdas[idxY].Count)
+                return (x, y);
+            
+            if (mapa.Celdas[idxY][idxX] != TipoTerreno.Roca)
             {
-                if (mapa.Celdas[ny - 1][nx - 1] != TipoTerreno.Roca)
+                return (x, y);
+            }
+            for (int ny = 1; ny <= mapa.Alto; ny++)
+            {
+                for (int nx = 1; nx <= mapa.Ancho; nx++)
                 {
-                    return (nx, ny);
+                    int currY = ny - 1;
+                    int currX = nx - 1;
+                    if (currY >= 0 && currY < mapa.Celdas.Count && 
+                        currX >= 0 && currX < mapa.Celdas[currY].Count &&
+                        mapa.Celdas[currY][currX] != TipoTerreno.Roca)
+                    {
+                        return (nx, ny);
+                    }
                 }
             }
         }
+        catch { }
         return (x, y);
     }
 
@@ -562,11 +680,10 @@ public class MainViewModel : ViewModelBase
         };
     }
 
-    private List<Recurso> GenerarRecursosIniciales()
+    private List<Recurso> GenerarRecursosIniciales(Mapa mapa)
     {
         var random = Random.Shared;
         var recursos = new List<Recurso>();
-        var mapa = _partidaActual!.Mapa;
 
         for (int i = 0; i < 12; i++)
         {

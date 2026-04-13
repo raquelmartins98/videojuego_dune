@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -27,6 +28,7 @@ public partial class MainWindow : Window
     private Grid _paginaAnterior = null!;
     private readonly string _configPath;
     private Configuracion _config;
+    private bool _creandoPartida = false;
 
     public MainWindow()
     {
@@ -63,22 +65,55 @@ public partial class MainWindow : Window
 
     private void SuscribirEventosViewModel(ViewModels.MainViewModel vm)
     {
-        vm.RondaCompletada += () => Dispatcher.Invoke(() => 
+        vm.RondaCompletada -= OnRondaCompletada;
+        vm.PartidaActualizada -= OnPartidaActualizada;
+        
+        vm.RondaCompletada += OnRondaCompletada;
+        vm.PartidaActualizada += OnPartidaActualizada;
+    }
+    
+    private void DesuscribirEventosViewModel(ViewModels.MainViewModel vm)
+    {
+        vm.RondaCompletada -= OnRondaCompletada;
+        vm.PartidaActualizada -= OnPartidaActualizada;
+    }
+    
+    private void OnRondaCompletada()
+    {
+        try
         {
-            if (vm.PartidaActual != null)
+            Dispatcher.Invoke(() =>
             {
-                DibujarMapa(vm.PartidaActual);
-                VerificarGameOver(vm);
-            }
-        });
-        vm.PartidaActualizada += () => Dispatcher.Invoke(() => 
+                if (DataContext is ViewModels.MainViewModel vm && vm.PartidaActual != null)
+                {
+                    DibujarMapa(vm.PartidaActual);
+                    VerificarGameOver(vm);
+                }
+            });
+        }
+        catch (Exception ex)
         {
-            if (vm.PartidaActual != null)
+            System.Diagnostics.Debug.WriteLine($"OnRondaCompletada error: {ex.Message}");
+        }
+    }
+    
+    private void OnPartidaActualizada()
+    {
+        try
+        {
+            Dispatcher.Invoke(() =>
             {
-                DibujarMapa(vm.PartidaActual);
-                VerificarGameOver(vm);
-            }
-        });
+                if (DataContext is ViewModels.MainViewModel vm && vm.PartidaActual != null)
+                {
+                    DibujarMapa(vm.PartidaActual);
+                    VerificarGameOver(vm);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OnPartidaActualizada error: {ex.Message}");
+        }
     }
 
     private void VerificarGameOver(ViewModels.MainViewModel vm)
@@ -130,6 +165,8 @@ public partial class MainWindow : Window
     
     private void DibujarMapa(Partida partida)
     {
+        if (_creandoPartida || MapaVisual == null || !IsLoaded) return;
+        
         MapaVisual.Children.Clear();
         
         if (partida?.Mapa?.Celdas == null) return;
@@ -296,36 +333,86 @@ public partial class MainWindow : Window
         PaginaOpciones.Visibility = Visibility.Collapsed;
         PaginaCreditos.Visibility = Visibility.Collapsed;
         PaginaBestiario.Visibility = Visibility.Collapsed;
-        PaginaManual.Visibility = Visibility.Collapsed;
         
         pagina.Visibility = Visibility.Visible;
     }
 
     private void NuevaPartida_Click(object sender, RoutedEventArgs e)
     {
-        SoundManager.PlayClick();
+        var logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
+        var log = new System.Text.StringBuilder();
+        Action<string> EscribirLog = (msg) => {
+            log.AppendLine($"{DateTime.Now:HH:mm:ss.fff} - {msg}");
+            System.Diagnostics.Debug.WriteLine(msg);
+        };
         
-        var dialog = new CrearPartidaWindow();
-        if (dialog.ShowDialog() == true)
+        try
         {
-            _musicaActual = "juego";
-            if (SoundManager.IsMenuMusicPlaying())
-            {
-                SoundManager.StopMusic();
-                SoundManager.PlayGameMusic();
-            }
+            EscribirLog("=== NUEVA PARTIDA CLICK INICIO ===");
             
-            MostrarPagina(PaginaJuego);
+            SoundManager.PlayClick();
+            EscribirLog("Click reproducido");
             
-            if (DataContext is ViewModels.MainViewModel vm)
+            EscribirLog($"Estado actual - MenuVisible: {MenuPrincipal.Visibility == Visibility.Visible}, JuegoVisible: {PaginaJuego.Visibility == Visibility.Visible}");
+            
+            var dialog = new CrearPartidaWindow();
+            EscribirLog("Dialog creado");
+            
+            EscribirLog("Antes de ShowDialog");
+            var result = dialog.ShowDialog();
+            EscribirLog($"DESPUES de ShowDialog - result: {result}");
+            
+            if (result == true)
             {
-                vm.CrearPartidaConNombre(dialog.NombrePartida);
-                SuscribirEventosViewModel(vm);
-                if (vm.PartidaActual != null)
+                EscribirLog("=== INICIO NuevaPartida_Click ===");
+                EscribirLog($"Nombre partida: {dialog.NombrePartida}");
+                
+                if (DataContext is ViewModels.MainViewModel vm)
                 {
-                    DibujarMapa(vm.PartidaActual);
+                    EscribirLog("VM obtenido");
+                    EscribirLog("Antes de LimpiarEventos");
+                    vm.LimpiarEventos();
+                    EscribirLog("DESPUES de LimpiarEventos");
+                    
+                    EscribirLog("Antes de CrearPartidaConNombre");
+                    vm.CrearPartidaConNombre(dialog.NombrePartida);
+                    EscribirLog("DESPUES de CrearPartidaConNombre");
+                    
+                    vm.RondaCompletada += OnRondaCompletada;
+                    vm.PartidaActualizada += OnPartidaActualizada;
+                    EscribirLog("Eventos suscritos");
+                    
+                    _musicaActual = "juego";
+                    if (SoundManager.IsMenuMusicPlaying())
+                    {
+                        SoundManager.StopMusic();
+                        SoundManager.PlayGameMusic();
+                    }
+                    
+                    MostrarPagina(PaginaJuego);
+                    EscribirLog("Pagina mostrada");
+                    
+                    if (vm.PartidaActual != null)
+                    {
+                        DibujarMapa(vm.PartidaActual);
+                        EscribirLog("Mapa dibujado");
+                    }
+                    
+                    EscribirLog("=== FIN NuevaPartida_Click EXITOSO ===");
                 }
             }
+            
+            EscribirLog("Escribiendo log final");
+            System.IO.File.WriteAllText(logPath, log.ToString());
+            EscribirLog("Log escrito");
+        }
+        catch (Exception ex)
+        {
+            log.AppendLine($"ERROR: {ex.Message}");
+            log.AppendLine(ex.StackTrace);
+            System.IO.File.WriteAllText(logPath, log.ToString());
+            System.Diagnostics.Debug.WriteLine($"ERROR NuevaPartida_Click: {ex.Message}");
+            MessageBox.Show($"Error: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -339,6 +426,55 @@ public partial class MainWindow : Window
     private void Slot1Cargar_Click(object sender, RoutedEventArgs e) => CargarSlot(0);
     private void Slot2Cargar_Click(object sender, RoutedEventArgs e) => CargarSlot(1);
     private void Slot3Cargar_Click(object sender, RoutedEventArgs e) => CargarSlot(2);
+
+    private void Slot1Eliminar_Click(object sender, RoutedEventArgs e) => EliminarSlot(0);
+    private void Slot2Eliminar_Click(object sender, RoutedEventArgs e) => EliminarSlot(1);
+    private void Slot3Eliminar_Click(object sender, RoutedEventArgs e) => EliminarSlot(2);
+
+    private void EliminarSlot(int index)
+    {
+        var logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
+        
+        try
+        {
+            System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] Slot {index} - inicio\n");
+            
+            if (_partidasGuardadas[index] == null)
+            {
+                System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] Slot {index} - es null, return\n");
+                return;
+            }
+
+            SoundManager.PlayClick();
+            
+            System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] Slot {index} - creando dialog\n");
+            var dialog = new Views.ConfirmarEliminarWindow($"¿Estás seguro de eliminar la partida del SLOT {index + 1}?");
+            dialog.Owner = this;
+            
+            System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] Slot {index} - mostrando dialog\n");
+            dialog.ShowDialog();
+
+            System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] Slot {index} - dialog cerrado, confirmado={dialog.Confirmado}\n");
+            
+            if (dialog.Confirmado)
+            {
+                System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] Slot {index} - eliminando archivo\n");
+                if (File.Exists(_slotPaths[index]))
+                {
+                    File.Delete(_slotPaths[index]);
+                }
+                _partidasGuardadas[index] = null;
+                CargarSlots();
+                System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] Slot {index} - completado\n");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.IO.File.AppendAllText(logPath, $"{DateTime.Now:HH:mm:ss.fff} - [ELIMINAR] ERROR: {ex.Message}\n{ex.StackTrace}\n");
+            System.Diagnostics.Debug.WriteLine($"Error al eliminar slot: {ex.Message}");
+            MessageBox.Show($"Error al eliminar: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
 
     private void CargarSlot(int index)
     {
@@ -521,12 +657,6 @@ public partial class MainWindow : Window
     private void TestGameOver_Click(object sender, RoutedEventArgs e)
     {
         MostrarGameOver("Modo de prueba.\nLa doma de Arrakis ha fracasado.");
-    }
-
-    private void IrAManual_Click(object sender, RoutedEventArgs e)
-    {
-        SoundManager.PlayClick();
-        MostrarPagina(PaginaManual);
     }
 
     private void IrABestiario_Click(object sender, RoutedEventArgs e)

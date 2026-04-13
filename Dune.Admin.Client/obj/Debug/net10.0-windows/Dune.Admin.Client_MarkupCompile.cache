@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\App.xaml
-2-156453749
+41357419936
 
-12-1281980949
+151055302235
 209-1820468641
-MainWindow.xaml;Views\CrearPartidaWindow.xaml;
+MainWindow.xaml;Views\BestiarioWindow.xaml;Views\ConfirmarEliminarWindow.xaml;Views\CrearPartidaWindow.xaml;
 
 False
 

@@ -1,3 +1,6 @@
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\click.mp3
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\game_music.mp3
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\menu_music.mp3
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\Dune.Admin.Client.exe
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\Dune.Admin.Client.deps.json
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\Dune.Admin.Client.runtimeconfig.json
@@ -10,12 +13,19 @@ C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\Dune.Simulation.Service.pdb
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\Dune.Persistence.Service.pdb
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client.csproj.AssemblyReference.cache
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Views\ConfirmarEliminarWindow.baml
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Views\CrearPartidaWindow.baml
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\MainWindow.g.cs
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Views\BestiarioWindow.g.cs
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Views\ConfirmarEliminarWindow.g.cs
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Views\CrearPartidaWindow.g.cs
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\App.g.cs
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client_MarkupCompile.cache
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client_MarkupCompile.lref
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\App.baml
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\MainWindow.baml
+C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Views\BestiarioWindow.baml
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client.g.resources
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client.AssemblyInfoInputs.cache
@@ -28,8 +38,3 @@ C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client.pdb
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\Dune.Admin.Client.genruntimeconfig.cache
 C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\ref\Dune.Admin.Client.dll
-C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\click.mp3
-C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\menu_music.mp3
-C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\bin\Debug\net10.0-windows\game_music.mp3
-C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\MainWindow.g.cs
-C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\MainWindow.baml

@@ -1,0 +1,18 @@
+17:48:25.363 - === NUEVA PARTIDA CLICK INICIO ===
+17:48:25.365 - Click reproducido
+17:48:25.365 - Estado actual - MenuVisible: True, JuegoVisible: False
+17:48:25.368 - Dialog creado
+17:48:25.368 - Antes de ShowDialog
+17:48:28.675 - DESPUES de ShowDialog - result: True
+17:48:28.675 - === INICIO NuevaPartida_Click ===
+17:48:28.675 - Nombre partida: MEME
+17:48:28.675 - VM obtenido
+17:48:28.675 - Antes de LimpiarEventos
+17:48:28.675 - DESPUES de LimpiarEventos
+17:48:28.675 - Antes de CrearPartidaConNombre
+17:48:28.681 - DESPUES de CrearPartidaConNombre
+17:48:28.681 - Eventos suscritos
+17:48:28.682 - Pagina mostrada
+17:48:28.688 - Mapa dibujado
+17:48:28.688 - === FIN NuevaPartida_Click EXITOSO ===
+17:48:28.688 - Escribiendo log final

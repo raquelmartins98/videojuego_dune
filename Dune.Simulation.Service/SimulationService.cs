@@ -160,7 +160,7 @@ public class SimulationService : ISimulationService
         
         return new Criatura
         {
-            Nombre = $"{tipoCompatible.Nombre} (clon)",
+            Nombre = $"{tipoCompatible.Nombre} (hijo)",
             Tipo = tipoCompatible.Tipo,
             Medio = tipoCompatible.Medio,
             Rol = instalacion.Rol == "RECOLECTOR" ? RolCriatura.Recolector : RolCriatura.Depredador,

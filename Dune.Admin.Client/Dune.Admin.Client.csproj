@@ -18,6 +18,22 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Resources\gusano.png"/>
+    <Resource Include="Resources\tigre.png"/>
+    <Resource Include="Resources\halcon.png"/>
+    <Resource Include="Resources\roedoer.png"/>
+    <Resource Include="Resources\ameba.png"/>
+    <Resource Include="Resources\arena1.png"/>
+    <Resource Include="Resources\arena2.png"/>
+    <Resource Include="Resources\arena3.png"/>
+    <Resource Include="Resources\rocas.png"/>
+    <Resource Include="Resources\rosa.png"/>
+    <Resource Include="Resources\negro.png"/>
+    <Resource Include="Resources\agua.png"/>
+    <Resource Include="Resources\milagne.png"/>
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
