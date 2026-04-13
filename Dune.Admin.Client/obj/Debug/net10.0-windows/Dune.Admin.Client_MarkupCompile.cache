@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\obj\Debug\net10.0-windows\
+/workspaces/videojuego_dune/Dune.Admin.Client/obj/Debug/net10.0-windows/
 Dune.Admin.Client
 none
 false
 TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-C:\Users\raque\Desktop\Proyecto-Dune\proyecto2\Dune.Admin.Client\App.xaml
-41357419936
+/workspaces/videojuego_dune/Dune.Admin.Client/App.xaml
+4-1935186628
 
-151055302235
-209-1820468641
-MainWindow.xaml;Views\BestiarioWindow.xaml;Views\ConfirmarEliminarWindow.xaml;Views\CrearPartidaWindow.xaml;
+15-105813700
+2082097317885
+MainWindow.xaml;Views/BestiarioWindow.xaml;Views/ConfirmarEliminarWindow.xaml;Views/CrearPartidaWindow.xaml;
 
 False
 

@@ -1,0 +1,16 @@
+/workspaces/videojuego_dune/Dune.Persistence.Service/bin/Release/net10.0/Dune.Persistence.Service.deps.json
+/workspaces/videojuego_dune/Dune.Persistence.Service/bin/Release/net10.0/Dune.Persistence.Service.dll
+/workspaces/videojuego_dune/Dune.Persistence.Service/bin/Release/net10.0/Dune.Persistence.Service.pdb
+/workspaces/videojuego_dune/Dune.Persistence.Service/bin/Release/net10.0/Dune.Domain.dll
+/workspaces/videojuego_dune/Dune.Persistence.Service/bin/Release/net10.0/Dune.Domain.pdb
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.csproj.AssemblyReference.cache
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.GeneratedMSBuildEditorConfig.editorconfig
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.AssemblyInfoInputs.cache
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.AssemblyInfo.cs
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.csproj.CoreCompileInputs.cache
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.sourcelink.json
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Per.857C2E34.Up2Date
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.dll
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/refint/Dune.Persistence.Service.dll
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/Dune.Persistence.Service.pdb
+/workspaces/videojuego_dune/Dune.Persistence.Service/obj/Release/net10.0/ref/Dune.Persistence.Service.dll

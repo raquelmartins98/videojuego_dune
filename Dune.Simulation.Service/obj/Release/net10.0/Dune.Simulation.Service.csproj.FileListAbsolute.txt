@@ -1,0 +1,16 @@
+/workspaces/videojuego_dune/Dune.Simulation.Service/bin/Release/net10.0/Dune.Simulation.Service.deps.json
+/workspaces/videojuego_dune/Dune.Simulation.Service/bin/Release/net10.0/Dune.Simulation.Service.dll
+/workspaces/videojuego_dune/Dune.Simulation.Service/bin/Release/net10.0/Dune.Simulation.Service.pdb
+/workspaces/videojuego_dune/Dune.Simulation.Service/bin/Release/net10.0/Dune.Domain.dll
+/workspaces/videojuego_dune/Dune.Simulation.Service/bin/Release/net10.0/Dune.Domain.pdb
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.csproj.AssemblyReference.cache
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.GeneratedMSBuildEditorConfig.editorconfig
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.AssemblyInfoInputs.cache
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.AssemblyInfo.cs
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.csproj.CoreCompileInputs.cache
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.sourcelink.json
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Sim.13795469.Up2Date
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.dll
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/refint/Dune.Simulation.Service.dll
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/Dune.Simulation.Service.pdb
+/workspaces/videojuego_dune/Dune.Simulation.Service/obj/Release/net10.0/ref/Dune.Simulation.Service.dll

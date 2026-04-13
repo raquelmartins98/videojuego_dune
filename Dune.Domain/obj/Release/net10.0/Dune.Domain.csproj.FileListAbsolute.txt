@@ -1,0 +1,12 @@
+/workspaces/videojuego_dune/Dune.Domain/bin/Release/net10.0/Dune.Domain.deps.json
+/workspaces/videojuego_dune/Dune.Domain/bin/Release/net10.0/Dune.Domain.dll
+/workspaces/videojuego_dune/Dune.Domain/bin/Release/net10.0/Dune.Domain.pdb
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/Dune.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/Dune.Domain.AssemblyInfoInputs.cache
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/Dune.Domain.AssemblyInfo.cs
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/Dune.Domain.csproj.CoreCompileInputs.cache
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/Dune.Domain.sourcelink.json
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/Dune.Domain.dll
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/refint/Dune.Domain.dll
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/Dune.Domain.pdb
+/workspaces/videojuego_dune/Dune.Domain/obj/Release/net10.0/ref/Dune.Domain.dll

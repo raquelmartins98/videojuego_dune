@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Simulation.Service\\Dune.Simulation.Service.csproj": {}
+    "/workspaces/videojuego_dune/Dune.Simulation.Service/Dune.Simulation.Service.csproj": {}
   },
   "projects": {
-    "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Domain\\Dune.Domain.csproj": {
+    "/workspaces/videojuego_dune/Dune.Domain/Dune.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Domain\\Dune.Domain.csproj",
+        "projectUniqueName": "/workspaces/videojuego_dune/Dune.Domain/Dune.Domain.csproj",
         "projectName": "Dune.Domain",
-        "projectPath": "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Domain\\Dune.Domain.csproj",
-        "packagesPath": "C:\\Users\\raque\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Domain\\obj\\",
+        "projectPath": "/workspaces/videojuego_dune/Dune.Domain/Dune.Domain.csproj",
+        "packagesPath": "/home/codespace/.nuget/packages/",
+        "outputPath": "/workspaces/videojuego_dune/Dune.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\raque\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/codespace/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net10.0": {
@@ -59,7 +59,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Users\\raque\\scoop\\apps\\dotnet-sdk\\current\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -337,17 +337,17 @@
         }
       }
     },
-    "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Simulation.Service\\Dune.Simulation.Service.csproj": {
+    "/workspaces/videojuego_dune/Dune.Simulation.Service/Dune.Simulation.Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Simulation.Service\\Dune.Simulation.Service.csproj",
+        "projectUniqueName": "/workspaces/videojuego_dune/Dune.Simulation.Service/Dune.Simulation.Service.csproj",
         "projectName": "Dune.Simulation.Service",
-        "projectPath": "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Simulation.Service\\Dune.Simulation.Service.csproj",
-        "packagesPath": "C:\\Users\\raque\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Simulation.Service\\obj\\",
+        "projectPath": "/workspaces/videojuego_dune/Dune.Simulation.Service/Dune.Simulation.Service.csproj",
+        "packagesPath": "/home/codespace/.nuget/packages/",
+        "outputPath": "/workspaces/videojuego_dune/Dune.Simulation.Service/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\raque\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/codespace/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -359,8 +359,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Domain\\Dune.Domain.csproj": {
-                "projectPath": "C:\\Users\\raque\\Desktop\\Proyecto-Dune\\proyecto2\\Dune.Domain\\Dune.Domain.csproj"
+              "/workspaces/videojuego_dune/Dune.Domain/Dune.Domain.csproj": {
+                "projectPath": "/workspaces/videojuego_dune/Dune.Domain/Dune.Domain.csproj"
               }
             }
           }
@@ -375,7 +375,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net10.0": {
@@ -396,7 +396,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Users\\raque\\scoop\\apps\\dotnet-sdk\\current\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

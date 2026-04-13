@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  dune-mcp-server:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+    volumes:
+      - ./data:/app/data  # For persistence if needed
